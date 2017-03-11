@@ -37,6 +37,7 @@ type Module struct {
 }
 
 func (mg *Module) SetMountPath(path string) {
+
 	mg.MountPath = path
 }
 

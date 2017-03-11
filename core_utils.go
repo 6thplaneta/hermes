@@ -77,14 +77,22 @@ func IsNil(value interface{}) (bool, error) {
 * @param 	string 			type of field
 * @return	string 			string value
  */
-func CastToStr(vl interface{}, typ string) string {
+func CastToStr(vl interface{}, typ, dbtype string) string {
 	var castedVal string
 	switch typ {
 	case "time":
 		val, _ := vl.(time.Time)
 
-		castedVal = val.Format(Messages["LongForm"])
+		if dbtype == "date" {
+			castedVal = val.Format(Messages["ShortForm"])
 
+		} else if dbtype == "time" {
+			castedVal = val.Format(Messages["TimeForm"])
+
+		} else {
+			castedVal = val.Format(Messages["LongForm"])
+
+		}
 		break
 	case "bool":
 		castedVal = fmt.Sprintf("%t", vl)
@@ -115,7 +123,7 @@ func CastToStr(vl interface{}, typ string) string {
 * @param 	string 			type of array
 * @return	string 			casted value (example 'hi','salam')
  */
-func CastArrToStr(vl interface{}, typ string) string {
+func CastArrToStr(vl interface{}, typ, dbtype string) string {
 	var cs string
 	rs := ""
 	if typ == "int" {
@@ -124,7 +132,7 @@ func CastArrToStr(vl interface{}, typ string) string {
 			return ""
 		}
 		for _, v := range arr {
-			cs = CastToStr(v, "int")
+			cs = CastToStr(v, "int", dbtype)
 
 			rs += cs + ","
 		}
@@ -134,7 +142,7 @@ func CastArrToStr(vl interface{}, typ string) string {
 			return ""
 		}
 		for _, v := range arr {
-			cs = CastToStr(v, "float64")
+			cs = CastToStr(v, "float64", dbtype)
 			rs += cs + ","
 		}
 	} else if typ == "string" {
@@ -143,7 +151,7 @@ func CastArrToStr(vl interface{}, typ string) string {
 			return ""
 		}
 		for _, v := range arr {
-			cs = CastToStr(v, "string")
+			cs = CastToStr(v, "string", dbtype)
 			cs = "'" + cs + "'"
 			rs += cs + ","
 		}
@@ -153,7 +161,7 @@ func CastArrToStr(vl interface{}, typ string) string {
 			return ""
 		}
 		for _, v := range arr {
-			cs = CastToStr(v, "bool")
+			cs = CastToStr(v, "bool", dbtype)
 			rs += cs + ","
 		}
 	} else if typ == "time" {
@@ -162,7 +170,7 @@ func CastArrToStr(vl interface{}, typ string) string {
 			return ""
 		}
 		for _, v := range arr {
-			cs = CastToStr(v, "time")
+			cs = CastToStr(v, "time", dbtype)
 			cs = "'" + cs + "'"
 			rs += cs + ","
 		}
@@ -307,4 +315,12 @@ func RandStringRunes(n int) string {
 		b[i] = letterRunes[rand.Intn(len(letterRunes))]
 	}
 	return string(b)
+}
+
+func DeallocateStatements() {
+	for {
+
+		time.Sleep(time.Minute)
+		application.DataSrc.DB.Exec("deallocate all;")
+	}
 }

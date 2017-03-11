@@ -20,6 +20,7 @@ type Agent struct {
 	No_Password bool   `json:"-"`
 	Roles       []Role `json:"roles,omitempty" db:"-" hermes:"many2many:Role_Agent"`
 	Device      Device `db:"-" json:"device"`
+	Is_Deleted  bool   `json:"is_deleted" hermes:"index,editable"`
 }
 
 type AgentCollection struct {
@@ -229,7 +230,7 @@ func (col *AgentCollection) UpdatePasswordByOld(tokenn string, id int, oldPasswo
 func (col *AgentCollection) GetByFId(identity string, fid string) (Agent, error) {
 
 	agent := Agent{}
-	err := col.DataSrc.DB.Get(&agent, fmt.Sprintf("select * from agents where identity= '%s' and fid= '%s' ", identity, fid))
+	err := col.DataSrc.DB.Get(&agent, fmt.Sprintf("select * from agents where identity= '%s' and fid= '%s' and is_deleted=false ", identity, fid))
 	if err != nil {
 		if err == ErrNoRows {
 			return Agent{}, ErrNotFound
@@ -243,7 +244,7 @@ func (col *AgentCollection) GetByFId(identity string, fid string) (Agent, error)
 func (col *AgentCollection) GetByGId(identity string, gid string) (Agent, error) {
 
 	agent := Agent{}
-	err := col.DataSrc.DB.Get(&agent, fmt.Sprintf("select * from agents where identity= '%s' and gid= '%s' ", identity, gid))
+	err := col.DataSrc.DB.Get(&agent, fmt.Sprintf("select * from agents where identity= '%s' and gid= '%s' and is_deleted=false ", identity, gid))
 	if err != nil {
 		if err == ErrNoRows {
 			return Agent{}, ErrNotFound
@@ -292,7 +293,7 @@ func (col *AgentCollection) GetByIdentityPass(identity string, password string) 
 
 func (col *AgentCollection) ExistsByIdentity(identity string) (bool, error) {
 	var agent Agent
-	err := col.DataSrc.DB.Get(&agent, fmt.Sprintf("select * from agents where identity = '%s'", identity))
+	err := col.DataSrc.DB.Get(&agent, fmt.Sprintf("select * from agents where identity = '%s' and is_deleted=false ", identity))
 
 	if err != nil {
 		if err == ErrNoRows {
@@ -427,8 +428,8 @@ func (col *AgentCollection) Login(agent Agent, url string) (AgentToken, error) {
 			return AgentToken{}, err
 		}
 	} else if url == "Facebook" {
-		ragent, err = col.GetByFId(agent.Identity, agent.FId)
 
+		ragent, err = col.GetByFId(agent.Identity, agent.FId)
 		if err != nil {
 			return AgentToken{}, err
 		}
@@ -441,6 +442,7 @@ func (col *AgentCollection) Login(agent Agent, url string) (AgentToken, error) {
 	}
 
 	if ragent.Is_Active == false {
+
 		_, err = col.DataSrc.DB.Exec(fmt.Sprintf(" update agent_tokens set is_expired=true where type='activation' and agent_id=%d ", ragent.Id))
 		if err != nil {
 			return AgentToken{}, err

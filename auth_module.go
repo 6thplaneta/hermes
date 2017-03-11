@@ -40,7 +40,7 @@ var permCont, roleCont, rolePermCont, roleAgentCont, agentTokenCont *Controller
 func (um *authModule) Init(app *App) error {
 	um.Name = "Auth"
 	application = app
-	settings := app.GetSettings("agents")
+	settings := app.GetSettings("Agents")
 	if settings["Secret"] == nil {
 		return errors.New("secret config does not exists")
 	}

@@ -24,6 +24,8 @@ func InitMessages() {
 	Messages["PasswordFormat"] = "^[a-z.A-Z.0-9]{6,}$"
 	Messages["ShortForm"] = "2006-01-02"
 	Messages["LongForm"] = "2006-01-02T15:04:05-07:00"
+	Messages["TimeForm"] = "00:00:00"
+
 	Messages["Forbidden"] = "You are not authorized for access to this resource"
 	Messages["ExpectedPointer"] = "Expected pointer value!"
 	Messages["RateExceed"] = "Rate of request exceeds server policy"

@@ -9,9 +9,17 @@ import (
 func AuthMiddleware(escapes []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		for i := 0; i < len(escapes); i++ {
+		if authEnabled == false {
+			c.Next()
+			return
+		}
 
-			if strings.Contains(c.Request.URL.Path, escapes[i]) {
+		for i := 0; i < len(escapes); i++ {
+			var str string
+			str = escapes[i]
+
+			strs := strings.Split(str, ":")
+			if c.Request.Method == strs[0] && strings.Contains(c.Request.URL.Path, strs[1]) {
 				c.Next()
 				return
 			}
@@ -24,13 +32,13 @@ func AuthMiddleware(escapes []string) gin.HandlerFunc {
 			return
 		}
 		exists, err := AgentTokenColl.Exists(token)
-
 		if err != nil {
 
 			c.JSON(http.StatusInternalServerError, gin.H{"message": Messages["InternalServerError"]})
 			return
 		}
 		if !exists {
+
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}

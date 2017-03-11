@@ -1,8 +1,6 @@
 package hermes
 
 import (
-	// "errors"
-	// "fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"

@@ -11,7 +11,8 @@ import (
 	"time"
 )
 
-func ChangeGoTypeToPostgres(typeOfField string) string {
+func ChangeGoTypeToPostgres(typeOfField, dbtype string) string {
+
 	var typ string
 	if typeOfField == "string" {
 		typ = "text"
@@ -20,9 +21,25 @@ func ChangeGoTypeToPostgres(typeOfField string) string {
 	} else if typeOfField == "bool" {
 		typ = "boolean"
 	} else if typeOfField == "time" {
-		typ = "timestamp with time zone"
+
+		if dbtype == "date" {
+			typ = "date"
+
+		} else if dbtype == "time" {
+			typ = "time without time zone"
+
+		} else {
+			typ = "timestamp with time zone"
+		}
+
 	} else if typeOfField == "float32" || typeOfField == "float64" {
-		typ = "real"
+		if dbtype != "" {
+			if dbtype == "double" {
+				typ = "double precision"
+			}
+		} else {
+			typ = "real"
+		}
 	}
 
 	return typ
@@ -41,6 +58,7 @@ func getUpdateQuery(columns []string, obj interface{}, id int) string {
 
 		if dbtag != "-" {
 			_, typeOfField := GetFieldExistanceAndType(obj, typeField.Name)
+			dbtype, _ := GetTagValue(obj, typeField.Name, "hermes", "dbtype")
 
 			if typeField.Name != "Id" {
 				updateQuery = updateQuery + typeField.Name + "=" + "$" + strconv.Itoa(counter) + ","
@@ -50,9 +68,9 @@ func getUpdateQuery(columns []string, obj interface{}, id int) string {
 
 			strKeys = strKeys + typeField.Name + ","
 			// fmt.Println("column , field is ", columns[i], GetFieldJsonByInst(obj, columns[i]))
-			val := prepareValue(rval.FieldByName(columns[i]).Interface(), typeOfField)
+			val := prepareValue(rval.FieldByName(columns[i]).Interface(), typeOfField, dbtype)
 			strVals = strVals + val + ","
-			strTypes = strTypes + ChangeGoTypeToPostgres(typeOfField) + ","
+			strTypes = strTypes + ChangeGoTypeToPostgres(typeOfField, dbtype) + ","
 
 		}
 
@@ -86,6 +104,8 @@ func getInsertQuery(obj interface{}) string {
 
 			if typeField.Name != "Id" {
 				defaultv, _ := GetTagValue(obj, typeField.Name, "hermes", "default")
+				dbtype, _ := GetTagValue(obj, typeField.Name, "hermes", "dbtype")
+
 				fname := rval.FieldByName(typeField.Name)
 
 				if defaultv != "" {
@@ -122,9 +142,9 @@ func getInsertQuery(obj interface{}) string {
 				}
 
 				strKeys = strKeys + typeField.Name + ","
-				val := prepareValue(rval.Field(i).Interface(), typeOfField)
+				val := prepareValue(rval.Field(i).Interface(), typeOfField, dbtype)
 				strVals = strVals + val + ","
-				strTypes = strTypes + ChangeGoTypeToPostgres(typeOfField) + ","
+				strTypes = strTypes + ChangeGoTypeToPostgres(typeOfField, dbtype) + ","
 				strParams = strParams + "$" + strconv.Itoa(counter) + ","
 				counter++
 			}
@@ -157,10 +177,12 @@ func AddTable(db *sqlx.DB, instance interface{}) error {
 	for i := 0; i < rval.NumField(); i++ {
 		typeField := rval.Type().Field(i)
 		dbtag := typeField.Tag.Get("db")
+		dbtype, _ := GetTagValue(instance, typeField.Name, "hermes", "dbtype")
 
 		_, typeOfField := GetFieldExistanceAndType(instance, typeField.Name)
 		//change golang types to postgres data types
-		typ := ChangeGoTypeToPostgres(typeOfField)
+
+		typ := ChangeGoTypeToPostgres(typeOfField, dbtype)
 
 		if dbtag != "-" {
 
@@ -224,7 +246,7 @@ func AddPostgresColumn(db *sqlx.DB, table interface{}, field, dbtype string) err
 	var defaultVal string
 	if dbtype == "text" {
 		defaultVal = "''"
-	} else if dbtype == "integer" || dbtype == "real" {
+	} else if dbtype == "integer" || dbtype == "real" || dbtype == "double precision" {
 		defaultVal = "0"
 	} else if dbtype == "boolean" {
 		defaultVal = "false"
@@ -294,7 +316,7 @@ func SyncSchema(db *sqlx.DB, table interface{}) error {
 
 			typ := ""
 			_, typeOfField := GetFieldExistanceAndType(table, field)
-
+			dbtype, _ := GetTagValue(table, typeField.Name, "hermes", "dbtype")
 			//change golang types to postgres data types
 			if typeOfField == "string" {
 				typ = "text"
@@ -303,9 +325,25 @@ func SyncSchema(db *sqlx.DB, table interface{}) error {
 			} else if typeOfField == "bool" {
 				typ = "boolean"
 			} else if typeOfField == "time" {
-				typ = "timestamp with time zone"
+				if dbtype == "time" {
+					typ = "time without time zone "
+
+				} else if dbtype == "date" {
+					typ = "date"
+
+				} else {
+					typ = "timestamp with time zone"
+
+				}
 			} else if typeOfField == "float32" || typeOfField == "float64" {
-				typ = "real"
+				if dbtype != "" {
+					if dbtype == "double" {
+						typ = "double precision"
+					}
+				} else {
+					typ = "real"
+
+				}
 			}
 
 			AddPostgresColumn(db, table, field, typ)
@@ -504,7 +542,7 @@ func GetCollection(token string, datasrc *DataSrc, instance interface{}, params 
 	ress := x.Interface()
 	if populate != "" {
 
-		err = PopulateCollection(token, db, ress, instance, populate)
+		err = PopulateCollection(SystemToken, db, ress, instance, populate)
 	}
 
 	return ress, err
@@ -591,10 +629,10 @@ func Report(datasrc *DataSrc, instance interface{}, fields []string, page, pageS
 	return &results, nil
 }
 
-func prepareValue(val interface{}, tp string) string {
+func prepareValue(val interface{}, tp, dbtype string) string {
 	var cval string
 
-	cval = CastToStr(val, tp)
+	cval = CastToStr(val, tp, dbtype)
 	if tp == "string" {
 		cval = EscapeChars(cval)
 		cval = "'" + cval + "'"
@@ -606,9 +644,9 @@ func prepareValue(val interface{}, tp string) string {
 
 	return cval
 }
-func prepareValueArr(val interface{}, tp string) string {
+func prepareValueArr(val interface{}, tp, dbtype string) string {
 	var cval string
-	cval = CastArrToStr(val, tp)
+	cval = CastArrToStr(val, tp, dbtype)
 	return cval
 }
 
@@ -734,28 +772,28 @@ func getCluaseVal(fieldName string, param Filter) string {
 	con := ""
 	switch param.Type {
 	case "array":
-		strVal := prepareValueArr(param.Value, param.FieldType)
+		strVal := prepareValueArr(param.Value, param.FieldType, "")
 		if strVal != "" {
-			con = fieldName + " IN (" + prepareValueArr(param.Value, param.FieldType) + ")"
+			con = fieldName + " IN (" + prepareValueArr(param.Value, param.FieldType, "") + ")"
 		}
 	case "range":
 		rangeFilter, _ := param.Value.(RangeFilter)
 		if rangeFilter.From != nil {
-			fromval := prepareValue(rangeFilter.From, param.FieldType)
+			fromval := prepareValue(rangeFilter.From, param.FieldType, "")
 			con = fieldName + " >= " + fromval
 		}
 		if rangeFilter.To != nil {
-			toval := prepareValue(rangeFilter.To, param.FieldType)
+			toval := prepareValue(rangeFilter.To, param.FieldType, "")
 			con = fieldName + " < " + toval
 		}
 		if rangeFilter.From != nil && rangeFilter.To != nil {
-			fromval := prepareValue(rangeFilter.From, param.FieldType)
-			toval := prepareValue(rangeFilter.To, param.FieldType)
+			fromval := prepareValue(rangeFilter.From, param.FieldType, "")
+			toval := prepareValue(rangeFilter.To, param.FieldType, "")
 			con = fieldName + " >= " + fromval + " and " + fieldName + " < " + toval
 
 		}
 	case "exact":
-		con = fieldName + "=" + prepareValue(param.Value, param.FieldType)
+		con = fieldName + "=" + prepareValue(param.Value, param.FieldType, "")
 	}
 	return con
 }
@@ -764,34 +802,34 @@ func getCluaseValues(fieldName string, param Filter) (string, string) {
 	con := ""
 	switch param.Type {
 	case "array":
-		strVal := prepareValueArr(param.Value, param.FieldType)
+		strVal := prepareValueArr(param.Value, param.FieldType, "")
 		if strVal != "" {
-			con = prepareValueArr(param.Value, param.FieldType)
+			con = prepareValueArr(param.Value, param.FieldType, "")
 			return "array[" + con + "]", ""
 		}
 	case "range":
 		rangeFilter, _ := param.Value.(RangeFilter)
 		if rangeFilter.From != nil {
-			fromval := prepareValue(rangeFilter.From, param.FieldType)
+			fromval := prepareValue(rangeFilter.From, param.FieldType, "")
 			con = fromval
 			return con, ""
 		}
 		if rangeFilter.To != nil {
-			toval := prepareValue(rangeFilter.To, param.FieldType)
+			toval := prepareValue(rangeFilter.To, param.FieldType, "")
 			con = toval
 			return con, ""
 
 		}
 		if rangeFilter.From != nil && rangeFilter.To != nil {
-			fromval := prepareValue(rangeFilter.From, param.FieldType)
-			toval := prepareValue(rangeFilter.To, param.FieldType)
+			fromval := prepareValue(rangeFilter.From, param.FieldType, "")
+			toval := prepareValue(rangeFilter.To, param.FieldType, "")
 			con = fromval
 			con1 := toval
 			return con, con1
 
 		}
 	case "exact":
-		con = prepareValue(param.Value, param.FieldType)
+		con = prepareValue(param.Value, param.FieldType, "")
 		return con, ""
 
 	}
@@ -802,7 +840,7 @@ func getCluaseValParams(fieldName string, param Filter, counter *int) string {
 	con := ""
 	switch param.Type {
 	case "array":
-		strVal := prepareValueArr(param.Value, param.FieldType)
+		strVal := prepareValueArr(param.Value, param.FieldType, "")
 		if strVal != "" {
 			con = fieldName + " = Any ($" + strconv.Itoa(*counter) + ")"
 		}
@@ -966,11 +1004,12 @@ func generateQuery(datasrc *DataSrc, instance interface{}, baseTable string, fie
 			sqlQuery += " and " + wCluase
 
 		}
+
 		if v.Type == "array" {
-			strTypes = strTypes + ChangeGoTypeToPostgres(v.FieldType) + "[],"
+			strTypes = strTypes + ChangeGoTypeToPostgres(v.FieldType, v.DBType) + "[],"
 
 		} else {
-			strTypes = strTypes + ChangeGoTypeToPostgres(v.FieldType) + ","
+			strTypes = strTypes + ChangeGoTypeToPostgres(v.FieldType, v.DBType) + ","
 
 		}
 		val1, val2 := getCluaseValues(fieldName, v)

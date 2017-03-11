@@ -12,6 +12,7 @@ import (
 //Example1: GetValueOfTagByKey("searchable,editable,type:int","type") returns "int"
 //Example2: GetValueOfTagByKey("searchable,editable,type:int","editable") returns ""
 func GetValueOfTagByKey(tag, key string) string {
+
 	if strings.Contains(tag, key) {
 		arr1 := strings.Split(tag, ",")
 		for _, val := range arr1 {
@@ -184,6 +185,7 @@ func GetFieldType(instance interface{}, name string) (reflect.Type, error) {
  */
 func GetTagValueByFeild(field reflect.StructField, tag, key string) (string, bool) {
 	strHermes := field.Tag.Get(tag)
+
 	if strings.Contains(strHermes, key) {
 		tagResult := GetValueOfTagByKey(strHermes, key)
 		return tagResult, true

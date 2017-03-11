@@ -12,7 +12,10 @@ type RangeFilter struct {
 type Filter struct {
 	Type      string
 	FieldType string
-	Value     interface{}
+
+	//todo mahsa
+	DBType string
+	Value  interface{}
 }
 
 type Params struct {

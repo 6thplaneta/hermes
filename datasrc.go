@@ -58,13 +58,13 @@ func (src *DataSrc) Init(conf *viper.Viper) error {
 }
 
 func (src *DataSrc) InitDB(conf *viper.Viper) error {
-	dbEngine := conf.GetString("db.Engine")
-	dbHost := conf.GetString("db.Host")
-	dbPort := conf.GetString("db.Port")
+	dbEngine := conf.GetString("DB.Engine")
+	dbHost := conf.GetString("DB.Host")
+	dbPort := conf.GetString("DB.Port")
 	dbAddr := dbHost + ":" + dbPort
-	dbName := conf.GetString("db.Name")
-	dbUser := conf.GetString("db.User")
-	dbPassword := conf.GetString("db.Password")
+	dbName := conf.GetString("DB.Name")
+	dbUser := conf.GetString("DB.User")
+	dbPassword := conf.GetString("DB.Password")
 
 	var errdb error
 	var db *sqlx.DB
@@ -98,17 +98,17 @@ func (src *DataSrc) InitDB(conf *viper.Viper) error {
 
 func (src *DataSrc) InitCache(conf *viper.Viper) error {
 	src.Cache = &CacheClient{}
-	useCache := conf.GetBool("cache.UseCache")
+	useCache := conf.GetBool("Cache.UseCache")
 	if !useCache {
 		return nil
 	}
-	engine := conf.GetString("cache.Engine")
+	engine := conf.GetString("Cache.Engine")
 	src.Cache.Engine = engine
 	if engine == "redis" {
 		//
 		client := redis.NewClient(&redis.Options{
-			Addr:     conf.GetString("cache.redis.Addr"),
-			Password: conf.GetString("cache.redis.Passwd"),
+			Addr:     conf.GetString("Cache.Redis.Addr"),
+			Password: conf.GetString("Cache.Redis.Passwd"),
 			DB:       0, // use default DB
 		})
 		_, err := client.Ping().Result()
@@ -120,7 +120,7 @@ func (src *DataSrc) InitCache(conf *viper.Viper) error {
 			src.Cache.Enabled = true
 		}
 	} else if engine == "freecache" {
-		cachesize := conf.GetInt("cache.freecache.Size") * 1024 * 1024
+		cachesize := conf.GetInt("Cache.FreeCache.Size") * 1024 * 1024
 		src.Cache.FreeCache = freecache.NewCache(cachesize)
 		src.Cache.Enabled = true
 	} else {
@@ -130,12 +130,12 @@ func (src *DataSrc) InitCache(conf *viper.Viper) error {
 }
 
 func (src *DataSrc) InitSearch(conf *viper.Viper) error {
-	searchEngine := conf.GetString("search.Engine")
+	searchEngine := conf.GetString("Search.Engine")
 	fmt.Println("search engine, (is elastic)?: ", searchEngine, searchEngine == "elastic")
 	src.Search = &SearchClient{Engine: searchEngine}
 	if searchEngine == "elastic" {
-		addr := conf.GetString("search.Elastic.Addr")
-		indexName := conf.GetString("search.Elastic.Index")
+		addr := conf.GetString("Search.Elastic.Addr")
+		indexName := conf.GetString("Search.Elastic.Index")
 		fmt.Println("initing search client. Addr, Index: ", addr, indexName)
 		client, err := elastic.NewClient(
 			elastic.SetURL(addr),

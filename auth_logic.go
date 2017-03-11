@@ -99,7 +99,6 @@ func Authorize(token, permis string, id int, action string, chkfunc func(string,
 		return true
 	}
 
-	//todo mahsa think about better way
 	if token == "" {
 		return false
 	}

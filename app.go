@@ -40,6 +40,7 @@ type App struct {
 
 func (app *App) config(path string) {
 	app.Conf.SetConfigFile(path)
+
 	// app.Conf.SetConfigName("conf")
 	// app.Conf.AddConfigPath(".")
 	// app.Conf.SetConfigType("yml")
@@ -110,7 +111,7 @@ func (app *App) GetSettings(name string) Settings {
 	if settings == nil {
 		return Settings{}
 	} else {
-		pubs := app.Conf.GetStringMap("public")
+		pubs := app.Conf.GetStringMap("Public")
 		for k, v := range pubs {
 			settings[k] = v
 		}
@@ -134,6 +135,10 @@ func (app *App) Mount(mg Moduler, mountbase string) {
 }
 
 func (app *App) Run() {
-	binding := app.Conf.GetString("app.Bind-Address")
+	go DeallocateStatements()
+
+	binding := app.Conf.GetString("App.Bind-Address")
+	app.Router.Use(CORSMiddleware())
+
 	app.Router.Run(binding)
 }

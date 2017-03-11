@@ -77,7 +77,6 @@ func strPopulateToArr(strval string) map[string]string {
 * @return	error 			error
  */
 func PopulateStruct(token string, dbInstance *sqlx.DB, value interface{}, populate string) error {
-
 	// get array of fields for population
 	arrPopulate := strPopulateToArr(populate)
 	// fmt.Println("arr populateis", arrPopulate, populate)
@@ -115,12 +114,14 @@ func PopulateStruct(token string, dbInstance *sqlx.DB, value interface{}, popula
 		kind := rval.FieldByName(strPopulate).Kind()
 		if kind == reflect.Struct {
 			// one 2 one relationship
+
 			refField, _ := GetTagValue(value, strPopulate, "hermes", "key")
 			if refField == "" {
 				refField = strPopulate + "_Id"
 			}
 
 			id := getFeildValue(rval, refField).(int)
+
 			if id != 0 {
 				obj, err := CollectionsMap[fieldType].Get(token, id, innerPopulate)
 

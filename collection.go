@@ -390,7 +390,7 @@ func (col *Collection) Get(token string, id int, populate string) (interface{}, 
 		return res, ErrNotFound
 	}
 	if populate != "" {
-		err = PopulateStruct(token, col.DataSrc.DB, res, populate)
+		err = PopulateStruct(SystemToken, col.DataSrc.DB, res, populate)
 	}
 	return res, err
 }
