@@ -31,13 +31,14 @@ func TestCreateAgent(t *testing.T) {
 
 func Test_UpdatePasswordByToken(t *testing.T) {
 
-	token := AgentToken{}
-	token, err := token.Create(NewToken(1, "password"))
+	AgentTokenColl := AgentTokenCollection{}
+
+	token, err := AgentTokenColl.CreateToken(NewToken(1, "password"))
 	assert.NoError(t, err)
 	token_test = token.Token
 
 	//old password 123456 -- change to 654321
-	err = AgentColl.UpdatePasswordByToken(token_test, "654321")
+	err = AgentColl.UpdatePasswordByToken(token_test, "654321", "m.ghoreishi1@gmail.com")
 	assert.NoError(t, err)
 
 	//old password error

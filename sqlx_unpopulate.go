@@ -159,7 +159,6 @@ func UnPopulate(token string, trans *sql.Tx, value interface{}) error {
 						}
 						rid := int(rval.FieldByName("Id").Int())
 						updateQ := fmt.Sprintf("update %s set %s=%d where id=%d;", tableName, fkey, rid, mid)
-						// fmt.Println("updating relation...", updateQ)
 						_, err := trans.Exec(updateQ)
 						if err != nil {
 							return err

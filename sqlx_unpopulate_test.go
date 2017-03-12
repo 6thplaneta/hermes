@@ -1,7 +1,6 @@
 package hermes
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -15,7 +14,7 @@ func TestPreUnPopulate(t *testing.T) {
 	supervisor := Supervisor{}
 	supervisor.Gender.Title = "female"
 
-	trans, _ := DBTest().Begin()
+	trans, _ := DBTest().DB.Begin()
 	e = PreUnPopulate(SystemToken, trans, &supervisor)
 	if e != nil {
 		trans.Rollback()
@@ -23,7 +22,7 @@ func TestPreUnPopulate(t *testing.T) {
 	trans.Commit()
 	assert.NoError(t, e)
 	var result []Gender
-	DBTest().Select(&result, "select * from gender ")
+	DBTest().DB.Select(&result, "select * from gender ")
 
 	assert.Equal(t, 1, len(result))
 	assert.Equal(t, 1, result[0].Id)
@@ -48,7 +47,7 @@ func TestUnPopulateOne2Many(t *testing.T) {
 
 	supervisor.Students = students
 
-	trans, _ := DBTest().Begin()
+	trans, _ := DBTest().DB.Begin()
 	e = UnPopulate(SystemToken, trans, &supervisor)
 	if e != nil {
 		trans.Rollback()
@@ -56,7 +55,7 @@ func TestUnPopulateOne2Many(t *testing.T) {
 	trans.Commit()
 	assert.NoError(t, e)
 	var result []Student
-	DBTest().Select(&result, "select * from students ")
+	DBTest().DB.Select(&result, "select * from students ")
 
 	assert.Equal(t, 2, len(result))
 	assert.Equal(t, 1, result[0].Id)
@@ -88,7 +87,7 @@ func TestUnPopulateMany2Many(t *testing.T) {
 
 	class.Students = students
 
-	trans, _ := DBTest().Begin()
+	trans, _ := DBTest().DB.Begin()
 	e = UnPopulate(SystemToken, trans, &class)
 	if e != nil {
 		trans.Rollback()
@@ -96,7 +95,7 @@ func TestUnPopulateMany2Many(t *testing.T) {
 	trans.Commit()
 	assert.NoError(t, e)
 	var result []Student
-	DBTest().Select(&result, "select * from students ")
+	DBTest().DB.Select(&result, "select * from students ")
 	assert.Equal(t, 2, len(result))
 	assert.Equal(t, 2, result[1].Id)
 	assert.Equal(t, "test2", result[1].Title)
@@ -104,7 +103,7 @@ func TestUnPopulateMany2Many(t *testing.T) {
 	assert.Equal(t, 1, result[1].Gender_Id)
 
 	var scresult []Student_Class
-	DBTest().Select(&scresult, "select * from student_class ")
+	DBTest().DB.Select(&scresult, "select * from student_class ")
 	assert.Equal(t, 2, len(scresult))
 	assert.Equal(t, 1, scresult[0].Id)
 	assert.Equal(t, 1, scresult[0].Class_Id)
@@ -117,14 +116,14 @@ func TestUnPopulateMany2Many(t *testing.T) {
 	e = UnPopulate(SystemToken, trans, &class)
 	var result1 []Student
 
-	DBTest().Select(&result1, "select * from students ")
+	DBTest().DB.Select(&result1, "select * from students ")
 	assert.Equal(t, 2, len(result1))
 	assert.Equal(t, "test1", result1[0].Title)
 	assert.Equal(t, "test2", result1[1].Title)
 
 	var scresult1 []Student_Class
 
-	DBTest().Select(&scresult1, "select * from student_class ")
+	DBTest().DB.Select(&scresult1, "select * from student_class ")
 	assert.Equal(t, 2, len(scresult1))
 	assert.Equal(t, 1, scresult1[0].Id)
 	assert.Equal(t, 1, scresult1[0].Class_Id)

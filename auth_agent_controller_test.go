@@ -20,9 +20,11 @@ func Test_AgentController_Start(t *testing.T) {
 func Test_GetAgentByToken(t *testing.T) {
 	_, err := AgentColl.Create(SystemToken, nil, &Agent{Identity: "m.ghoreishi1@gmail.com", Password: "123456"})
 	assert.NoError(t, err)
-	token := AgentToken{}
+	AgentTokenColl, err := NewAgentTokenCollection(AgentToken{}, DBTest())
+	assert.NoError(t, err)
+
 	newToken := NewToken(1, "login")
-	res, err := token.Create(newToken)
+	res, err := AgentTokenColl.CreateToken(newToken)
 	assert.NoError(t, err)
 	assert.Equal(t, res.Token, newToken.Token)
 	token_test = res.Token
@@ -143,7 +145,7 @@ func Test_ChangePasswordByToken(t *testing.T) {
 	//existing token test
 
 	var _token []string
-	DBTest().Select(&_token, " select token from agent_tokens where type='password' ")
+	DBTest().DB.Select(&_token, " select token from agent_tokens where type='password' ")
 
 	p = Password{}
 	p.New_Password = "123456"
@@ -205,7 +207,7 @@ func Test_Login_Controller(t *testing.T) {
 	assert.Equal(t, "\"Resource not found!\"\n", response.Body.String())
 
 	//correct email password
-	DBTest().Exec(" update agents set is_active=true where identity='m.ghoreishi1@gmail.com' ")
+	DBTest().DB.Exec(" update agents set is_active=true where identity='m.ghoreishi1@gmail.com' ")
 
 	agent = &Agent{}
 	agent.Identity = "m.ghoreishi1@gmail.com"
@@ -248,8 +250,11 @@ func Test_Logout(t *testing.T) {
 	assert.Equal(t, http.StatusOK, response.Code)
 	assert.Equal(t, "\"Resource deleted successfully!\"\n", response.Body.String())
 
-	agntTok := AgentToken{}
-	_, err := agntTok.GetToken(token_test, "login")
+	// agntTok := AgentToken{}
+	AgentTokenColl, err := NewAgentTokenCollection(AgentToken{}, DBTest())
+	assert.NoError(t, err)
+
+	_, err = AgentTokenColl.GetToken(token_test, "login")
 	assert.Error(t, err, "NotFound")
 
 }

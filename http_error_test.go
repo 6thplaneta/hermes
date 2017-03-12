@@ -50,11 +50,11 @@ func TestHandleHttpError(t *testing.T) {
 	assert.Equal(t, "\"error in db example\"\n", response.Body.String())
 	assert.Equal(t, http.StatusInternalServerError, response.Code)
 
-	//server error!
-	err = &CustomError{"NotValid", "RequiredPassword"}
-	request, _ = http.NewRequest("GET", "/test", nil)
-	response = httptest.NewRecorder()
-	router.ServeHTTP(response, request)
-	assert.Equal(t, "\"RequiredPassword\"\n", response.Body.String())
-	assert.Equal(t, http.StatusBadRequest, response.Code)
+	// //server error!
+	// err = &CustomError{"NotValid", "RequiredPassword"}
+	// request, _ = http.NewRequest("GET", "/test", nil)
+	// response = httptest.NewRecorder()
+	// router.ServeHTTP(response, request)
+	// assert.Equal(t, "\"RequiredPassword\"\n", response.Body.String())
+	// assert.Equal(t, http.StatusBadRequest, response.Code)
 }

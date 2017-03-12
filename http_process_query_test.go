@@ -1,6 +1,8 @@
 package hermes
 
 import (
+	// "github.com/gin-gonic/gin"
+
 	"github.com/stretchr/testify/assert"
 	"net/url"
 	"testing"
@@ -20,9 +22,11 @@ func TestGetFilterParams(t *testing.T) {
 		Male          bool
 	}
 
-	personColl, e := NewCollection(Person{}, DBTest())
-	assert.NoError(t, e)
-	cont := NewController(personColl, "", nil)
+	// personColl, e := NewCollection(Person{}, DBTest())
+	// assert.NoError(t, e)
+	// cont := NewController(personColl, "")
+
+	// c := *gin.Context{}
 
 	v := url.Values{}
 	v.Set("name", "mahsa")
@@ -35,7 +39,7 @@ func TestGetFilterParams(t *testing.T) {
 
 	v.Add("notexist", "33")
 
-	params := cont.ReadParams(v)
+	params := ReadHttpParams(v, Person{})
 	filterParams := params.List
 	assert.Equal(t, Filter{Type: "exact", FieldType: "string", Value: "mahsa"}, filterParams["Name"])
 	assert.Equal(t, Filter{Type: "exact", FieldType: "string", Value: "ghoreishi"}, filterParams["Family"])
@@ -47,7 +51,7 @@ func TestGetFilterParams(t *testing.T) {
 
 	v = url.Values{}
 	v.Add("age$from", "23")
-	params = cont.ReadParams(v)
+	params = ReadHttpParams(v, Person{})
 	filterParams = params.List
 
 	assert.Equal(t, Filter{Type: "range", FieldType: "int", Value: RangeFilter{From: 23}}, filterParams["Age"])
@@ -55,7 +59,7 @@ func TestGetFilterParams(t *testing.T) {
 	v = url.Values{}
 	v.Add("age$to", "23")
 	v.Add("register_date$from", "2016-02-22T18:24:49.193177+03:30")
-	params = cont.ReadParams(v)
+	params = ReadHttpParams(v, Person{})
 	filterParams = params.List
 
 	assert.Equal(t, Filter{Type: "range", FieldType: "time", Value: RangeFilter{From: "2016-02-22T18:24:49.193177+03:30"}}, filterParams["Register_Date"])

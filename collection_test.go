@@ -313,7 +313,7 @@ func Test_Indirect_Filter(t *testing.T) {
 	classColl.Create(SystemToken, nil, &class)
 	assert.NoError(t, e)
 
-	_, e = DBTest().Exec("insert into student_class(class_id,student_id)values(1,1);insert into student_class(class_id,student_id)values(2,2);")
+	_, e = DBTest().DB.Exec("insert into student_class(class_id,student_id)values(1,1);insert into student_class(class_id,student_id)values(2,2);")
 	assert.NoError(t, e)
 
 	params = NewParams(Student{})
@@ -403,7 +403,7 @@ func Test_Rel(t *testing.T) {
 	e = studentColl.Rel(SystemToken, 1, "Classes", []int{3})
 	assert.NoError(t, e)
 	var arr []Student_Class
-	e = dbInstance.Select(&arr, "select * from student_class where student_id=1 and class_id=3")
+	e = DBTest().DB.Select(&arr, "select * from student_class where student_id=1 and class_id=3")
 	assert.NoError(t, e)
 	assert.Equal(t, 1, len(arr))
 

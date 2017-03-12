@@ -15,7 +15,7 @@ func Test_Http_Controller_Start(t *testing.T) {
 
 }
 func Test_Http_Create(t *testing.T) {
-	cont := NewController(studentColl, "", nil)
+	cont := NewController(studentColl, "")
 
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
@@ -44,7 +44,7 @@ func Test_Http_Create(t *testing.T) {
 
 func Test_Http_Update(t *testing.T) {
 
-	cont := NewController(studentColl, "", nil)
+	cont := NewController(studentColl, "")
 
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
@@ -76,7 +76,7 @@ func Test_Http_Update(t *testing.T) {
 }
 
 func Test_Http_Get(t *testing.T) {
-	cont := NewController(studentColl, "", application.Cache)
+	cont := NewController(studentColl, "")
 
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
@@ -96,7 +96,7 @@ func Test_Http_Get(t *testing.T) {
 }
 
 func Test_Http_List(t *testing.T) {
-	cont := NewController(studentColl, "", application.Cache)
+	cont := NewController(studentColl, "")
 
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
@@ -147,7 +147,7 @@ func Test_Http_List(t *testing.T) {
 }
 
 func Test_Http_Delete(t *testing.T) {
-	cont := NewController(studentColl, "", application.Cache)
+	cont := NewController(studentColl, "")
 
 	gin.SetMode(gin.TestMode)
 	router := gin.New()

@@ -74,23 +74,23 @@ func TestIsNil(t *testing.T) {
 }
 
 func TestCastToStr(t *testing.T) {
-	assert.Equal(t, "true", CastToStr(true, "bool"))
-	assert.Equal(t, "false", CastToStr(false, "bool"))
-	assert.Equal(t, "1", CastToStr(1, "int"))
-	assert.Equal(t, "-2.5", CastToStr(-2.5, "float64"))
-	assert.Equal(t, "2.5", CastToStr(2.5, "float64"))
-	assert.Equal(t, "2.5", CastToStr(+2.5, "float64"))
-	assert.Equal(t, "'hello!'", CastToStr("hello!", "string"))
-	assert.Equal(t, "'1988-05-19T02:23:21+00:00'", CastToStr(time.Date(1988, 05, 19, 02, 23, 21, 0, time.UTC), "time"))
+	assert.Equal(t, "true", CastToStr(true, "bool", ""))
+	assert.Equal(t, "false", CastToStr(false, "bool", ""))
+	assert.Equal(t, "1", CastToStr(1, "int", ""))
+	assert.Equal(t, "-2.5", CastToStr(-2.5, "float64", ""))
+	assert.Equal(t, "2.5", CastToStr(2.5, "float64", ""))
+	assert.Equal(t, "2.5", CastToStr(+2.5, "float64", ""))
+	assert.Equal(t, "'hello!'", CastToStr("hello!", "string", ""))
+	assert.Equal(t, "'1988-05-19T02:23:21+00:00'", CastToStr(time.Date(1988, 05, 19, 02, 23, 21, 0, time.UTC), "time", ""))
 }
 
 func TestCastArrToStr(t *testing.T) {
-	assert.Equal(t, "true,false", CastArrToStr([]bool{true, false}, "bool"))
-	assert.Equal(t, "1,2,5", CastArrToStr([]int{1, 2, 5}, "int"))
-	assert.Equal(t, "1,2.5,5", CastArrToStr([]float64{1, 2.5, 5}, "float64"))
-	assert.Equal(t, "1,2.5,5", CastArrToStr([]float64{1, 2.5, 5}, "float64"))
-	assert.Equal(t, "'t','n','h'", CastArrToStr([]string{"t", "n", "h"}, "string"))
-	assert.Equal(t, "'1988-05-19T02:23:21+00:00','2016-05-19T02:23:21+00:00'", CastArrToStr([]time.Time{time.Date(1988, 05, 19, 02, 23, 21, 0, time.UTC), time.Date(2016, 05, 19, 02, 23, 21, 0, time.UTC)}, "time"))
+	assert.Equal(t, "true,false", CastArrToStr([]bool{true, false}, "bool", ""))
+	assert.Equal(t, "1,2,5", CastArrToStr([]int{1, 2, 5}, "int", ""))
+	assert.Equal(t, "1,2.5,5", CastArrToStr([]float64{1, 2.5, 5}, "float64", ""))
+	assert.Equal(t, "1,2.5,5", CastArrToStr([]float64{1, 2.5, 5}, "float64", ""))
+	assert.Equal(t, "'t','n','h'", CastArrToStr([]string{"t", "n", "h"}, "string", ""))
+	assert.Equal(t, "'1988-05-19T02:23:21+00:00','2016-05-19T02:23:21+00:00'", CastArrToStr([]time.Time{time.Date(1988, 05, 19, 02, 23, 21, 0, time.UTC), time.Date(2016, 05, 19, 02, 23, 21, 0, time.UTC)}, "time", ""))
 }
 
 func TestCastStrToVal(t *testing.T) {

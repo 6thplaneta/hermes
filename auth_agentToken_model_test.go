@@ -15,9 +15,11 @@ func TestCreateToken(t *testing.T) {
 	_, err := AgentColl.Create(SystemToken, nil, &Agent{Identity: "m.ghoreishi1@gmail.com", Password: "123456"})
 	assert.NoError(t, err)
 
-	token := AgentToken{}
+	AgentTokenColl, err := NewAgentTokenCollection(AgentToken{}, DBTest())
+	assert.NoError(t, err)
+
 	newToken := NewToken(1, "login")
-	res, err := token.Create(newToken)
+	res, err := AgentTokenColl.CreateToken(newToken)
 	assert.NoError(t, err)
 	assert.Equal(t, newToken.Token, res.Token)
 	assert.Equal(t, newToken.Type, res.Type)
@@ -26,8 +28,10 @@ func TestCreateToken(t *testing.T) {
 }
 
 func TestGetToken(t *testing.T) {
-	token := AgentToken{}
-	token, err := token.GetToken(token_test, "login")
+	AgentTokenColl, err := NewAgentTokenCollection(AgentToken{}, DBTest())
+	assert.NoError(t, err)
+
+	token, err := AgentTokenColl.GetToken(token_test, "login")
 	assert.NoError(t, err)
 	assert.Equal(t, 2, token.Id)
 	assert.Equal(t, token_test, token.Token)
@@ -35,17 +39,22 @@ func TestGetToken(t *testing.T) {
 }
 
 func TestExists(t *testing.T) {
-	token := AgentToken{}
-	exists, err := token.Exists(token_test)
+	// token := AgentToken{}
+	AgentTokenColl, err := NewAgentTokenCollection(AgentToken{}, DBTest())
+	assert.NoError(t, err)
+
+	exists, err := AgentTokenColl.Exists(token_test)
 	assert.NoError(t, err)
 	assert.Equal(t, true, exists)
 }
 func TestLogout(t *testing.T) {
-	token := AgentToken{}
-	err := token.Logout(token_test)
+	AgentTokenColl, err := NewAgentTokenCollection(AgentToken{}, DBTest())
 	assert.NoError(t, err)
 
-	token, err = token.GetToken(token_test, "login")
+	err = AgentTokenColl.Logout(token_test)
+	assert.NoError(t, err)
+
+	_, err = AgentTokenColl.GetToken(token_test, "login")
 	assert.Error(t, err, "NotFound")
 
 }

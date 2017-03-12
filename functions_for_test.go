@@ -8,16 +8,28 @@ import (
 	"time"
 )
 
-var instance *sqlx.DB
+var instance *DataSrc
+
 var sclassColl, sexColl, genderColl, classColl, studentColl, supervisorColl *Collection
 var e error
 
-func DBTest() *sqlx.DB {
-	if instance == nil {
-		db, _ := sqlx.Connect("postgres", "user=postgres password=123456 dbname=test_hermes sslmode=disable")
+// type DataSrc struct {
+// 	DB     *sqlx.DB
+// 	Cache  *CacheClient
+// 	Search *SearchClient
+// }
 
-		instance = db
+func DBTest() *DataSrc {
+
+	if instance == nil {
+		instance = &DataSrc{}
+		db, _ := sqlx.Connect("postgres", "user=postgres password=123456 dbname=test_hermes sslmode=disable")
+		search := SearchClient{}
+		instance.Search = &search
+		instance.Search.Engine = "sql"
+		instance.DB = db
 	}
+
 	return instance
 }
 
@@ -75,43 +87,43 @@ type Student_Class struct {
 }
 
 func addTempTables() error {
-	err := AddTable(DBTest(), AgentToken{})
+	err := AddTable(DBTest().DB, AgentToken{})
 	if err != nil {
 		return err
 	}
-	err = AddTable(DBTest(), Agent{})
+	err = AddTable(DBTest().DB, Agent{})
 	if err != nil {
 		return err
 	}
-	err = AddTable(DBTest(), Device{})
+	err = AddTable(DBTest().DB, Device{})
 	if err != nil {
 		return err
 	}
-	err = AddTable(DBTest(), Class{})
+	err = AddTable(DBTest().DB, Class{})
 	if err != nil {
 		return err
 	}
-	err = AddTable(DBTest(), Student_Class{})
+	err = AddTable(DBTest().DB, Student_Class{})
 	if err != nil {
 		return err
 	}
-	err = AddTable(DBTest(), Sex{})
+	err = AddTable(DBTest().DB, Sex{})
 	if err != nil {
 		return err
 	}
-	err = AddTable(DBTest(), Gender{})
+	err = AddTable(DBTest().DB, Gender{})
 	if err != nil {
 		return err
 	}
-	err = AddTable(DBTest(), Student{})
+	err = AddTable(DBTest().DB, Student{})
 	if err != nil {
 		return err
 	}
-	err = AddTable(DBTest(), Supervisor{})
+	err = AddTable(DBTest().DB, Supervisor{})
 	if err != nil {
 		return err
 	}
-	err = AddTable(DBTest(), Person{})
+	err = AddTable(DBTest().DB, Person{})
 	if err != nil {
 		return err
 	}
@@ -121,7 +133,7 @@ func addTempTables() error {
 
 func rmTempTables() error {
 	//remove table
-	_, e = DBTest().Exec("drop table persons;drop table students;drop table supervisors;drop table gender;drop table sex;drop table classes;drop table student_class;drop table agents;drop table agent_tokens;drop table devices;")
+	_, e = DBTest().DB.Exec("drop table persons;drop table students;drop table supervisors;drop table gender;drop table sex;drop table classes;drop table student_class;drop table agents;drop table agent_tokens;drop table devices;")
 	return e
 
 }
@@ -194,8 +206,8 @@ func TestMain(m *testing.M) {
 
 	InitMessages()
 	StructsMap["Student_Class"] = Student_Class{}
-	dbInstance = DBTest()
-	application.Cache = &CacheClient{}
+	// dbInstance = DBTest().DB
+	DBTest().Cache = &CacheClient{}
 	addTempCollections()
 
 	retCode := m.Run()

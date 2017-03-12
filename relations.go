@@ -21,8 +21,6 @@ func GetRelation(col Collectionist, id int, rel string) (interface{}, error) {
 	// to be tested
 	innerField := strings.Join(arrRel[1:], ".")
 
-	// fmt.Println("in get relation, innerpop, strpop:", innerField, "|", strField, "|")
-
 	//kind of feild
 	kind := rval.FieldByName(strField).Kind()
 	// if !ok {
@@ -33,7 +31,6 @@ func GetRelation(col Collectionist, id int, rel string) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Println("in get relation, field type, kind", fieldType, kind)
 
 	if fieldType.Kind() == reflect.Slice {
 		fieldType = fieldType.Elem()
@@ -42,8 +39,6 @@ func GetRelation(col Collectionist, id int, rel string) (interface{}, error) {
 	//find table name in database
 	dbName, _ := GetTagValueByType(fieldType, "Id", "hermes", "dbspace")
 	baseDbName, _ := GetTagValueByType(col.GetInstanceType(), "Id", "hermes", "dbspace")
-
-	// fmt.Println("in get relation, dbname", innerField, dbName)
 
 	if dbName == "" || fieldType == nil {
 		return nil, errors.New("Error: Populate condition wrong, ref dbspace: " + dbName + "filedType: " + fieldType.String())
@@ -61,7 +56,6 @@ func GetRelation(col Collectionist, id int, rel string) (interface{}, error) {
 		if err != nil {
 			return nil, err
 		}
-		// fmt.Println("inner id is ", innerid, innerField == "")
 		var obj interface{}
 		var errN error
 		if innerid != 0 {
@@ -89,12 +83,10 @@ func GetRelation(col Collectionist, id int, rel string) (interface{}, error) {
 }
 
 func GetOwner(col Collectionist, id int) (interface{}, error) {
-	// fmt.Println("getting owner!", col.GetInstanceType(), id)
 	onwerRel, hasOwner := GetTagValue(col.GetInstance(), "Id", "hermes", "owner")
 	if !hasOwner {
 		return nil, errors.New("owner is not specified!" + col.GetInstanceType().Name())
 	}
-	// return "hiii", nil
 	return GetRelation(col, id, onwerRel)
 }
 

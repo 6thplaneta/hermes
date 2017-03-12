@@ -79,7 +79,6 @@ func strPopulateToArr(strval string) map[string]string {
 func PopulateStruct(token string, dbInstance *sqlx.DB, value interface{}, populate string) error {
 	// get array of fields for population
 	arrPopulate := strPopulateToArr(populate)
-	// fmt.Println("arr populateis", arrPopulate, populate)
 	//reflected value of struct
 	rval := reflect.ValueOf(value)
 	if rval.Kind() == reflect.Ptr {
@@ -92,7 +91,6 @@ func PopulateStruct(token string, dbInstance *sqlx.DB, value interface{}, popula
 		strPopulate = GetFieldJsonByInst(value, strPopulate)
 
 		// innerPopulate = GetTitle(innerPopulate)
-		// fmt.Println("inner populate before after ", innerPopulate, strPopulate)
 
 		fieldType, err := GetFieldType(value, strPopulate)
 		if err != nil {

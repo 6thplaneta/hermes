@@ -59,7 +59,7 @@ func TestPopulateOne2One(t *testing.T) {
 
 	//test one 2 one one level relationship start
 
-	_, e = DBTest().Exec("insert into sex(id,title)values(1,'woman');")
+	_, e = DBTest().DB.Exec("insert into sex(id,title)values(1,'woman');")
 	assert.NoError(t, e)
 
 	gender := Gender{Title: "female"}
@@ -79,7 +79,7 @@ func TestPopulateOne2One(t *testing.T) {
 	person.Gender_Id = 1
 	person.Student_Id = 1
 
-	e = PopulateStruct(SystemToken, DBTest(), &person, "student(sex,gender,supervisor(gender)),gender,")
+	e = PopulateStruct(SystemToken, DBTest().DB, &person, "student(sex,gender,supervisor(gender)),gender,")
 	assert.NoError(t, e)
 	assert.Equal(t, "female", person.Gender.Title)
 	assert.Equal(t, 1, person.Gender.Id)
@@ -92,7 +92,7 @@ func TestPopulateOne2One(t *testing.T) {
 
 	var arr [1]Person
 	arr[0] = person
-	e = PopulateCollection(SystemToken, DBTest(), &arr, &Person{}, "student(sex,gender,supervisor(gender)),gender,")
+	e = PopulateCollection(SystemToken, DBTest().DB, &arr, &Person{}, "student(sex,gender,supervisor(gender)),gender,")
 	assert.NoError(t, e)
 	assert.Equal(t, "female", arr[0].Gender.Title)
 	assert.Equal(t, 1, arr[0].Gender.Id)
@@ -113,7 +113,7 @@ func TestPopulateOne2Many(t *testing.T) {
 
 	//test one 2 many start
 
-	_, e = DBTest().Exec("insert into sex(id,title)values(1,'woman');")
+	_, e = DBTest().DB.Exec("insert into sex(id,title)values(1,'woman');")
 	assert.NoError(t, e)
 
 	superv := Supervisor{Name: "dr jessica", Gender_Id: 1}
@@ -132,7 +132,7 @@ func TestPopulateOne2Many(t *testing.T) {
 	supervisor := Supervisor{}
 	supervisor.Id = 1
 
-	e = PopulateStruct(SystemToken, DBTest(), &supervisor, "students(sex)")
+	e = PopulateStruct(SystemToken, DBTest().DB, &supervisor, "students(sex)")
 	assert.NoError(t, e)
 
 	assert.Equal(t, 2, len(supervisor.Students))
@@ -141,7 +141,7 @@ func TestPopulateOne2Many(t *testing.T) {
 
 	var arr [1]Supervisor
 	arr[0] = supervisor
-	e = PopulateCollection(SystemToken, DBTest(), &arr, &supervisor, "students(sex)")
+	e = PopulateCollection(SystemToken, DBTest().DB, &arr, &supervisor, "students(sex)")
 	assert.NoError(t, e)
 	assert.Equal(t, 2, len(arr[0].Students))
 	assert.Equal(t, "woman", supervisor.Students[0].Sex.Title)
@@ -157,10 +157,10 @@ func TestPopulateMany2Many(t *testing.T) {
 
 	//test many 2 many start
 
-	_, e = DBTest().Exec("insert into sex(id,title)values(1,'woman');")
+	_, e = DBTest().DB.Exec("insert into sex(id,title)values(1,'woman');")
 	assert.NoError(t, e)
 
-	_, e = DBTest().Exec("insert into classes(id,title)values(1,'artificial intelligence');")
+	_, e = DBTest().DB.Exec("insert into classes(id,title)values(1,'artificial intelligence');")
 	assert.NoError(t, e)
 
 	stu := Student{Title: "mahsa ghoreishi", Age: 26, Gender_Id: 1, Sex_Id: 1, Supervisor_Id: 1, Login_Date: time.Now()}
@@ -171,14 +171,14 @@ func TestPopulateMany2Many(t *testing.T) {
 	_, e = studentColl.Create(SystemToken, nil, &stu)
 	assert.NoError(t, e)
 
-	_, e = DBTest().Exec("insert into student_class(id,class_id,student_id)values(1,1,1);insert into student_class(id,class_id,student_id)values(2,1,2);")
+	_, e = DBTest().DB.Exec("insert into student_class(id,class_id,student_id)values(1,1,1);insert into student_class(id,class_id,student_id)values(2,1,2);")
 	assert.NoError(t, e)
 
 	//populate struct
 	class := Class{}
 	class.Id = 1
 
-	e = PopulateStruct(SystemToken, DBTest(), &class, "students(sex)")
+	e = PopulateStruct(SystemToken, DBTest().DB, &class, "students(sex)")
 	assert.NoError(t, e)
 
 	assert.Equal(t, 2, len(class.Students))
@@ -188,7 +188,7 @@ func TestPopulateMany2Many(t *testing.T) {
 	//populate collection
 	var arr [1]Class
 	arr[0] = class
-	e = PopulateCollection(SystemToken, DBTest(), &arr, &class, "students(sex)")
+	e = PopulateCollection(SystemToken, DBTest().DB, &arr, &class, "students(sex)")
 	assert.NoError(t, e)
 	assert.Equal(t, 2, len(arr[0].Students))
 	assert.Equal(t, "woman", class.Students[0].Sex.Title)

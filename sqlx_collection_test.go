@@ -10,7 +10,7 @@ func TestCheckPostgresColumn(t *testing.T) {
 	assert.NoError(t, addTempTables())
 
 	var dbcols []string
-	e = DBTest().Select(&dbcols, "SELECT Column_Name FROM information_schema.columns WHERE table_name='persons'")
+	e = DBTest().DB.Select(&dbcols, "SELECT Column_Name FROM information_schema.columns WHERE table_name='persons'")
 	assert.NoError(t, e)
 
 	assert.Contains(t, dbcols, "id")
@@ -25,11 +25,11 @@ func TestCheckPostgresColumn(t *testing.T) {
 func TestAddPostgresColumn(t *testing.T) {
 	assert.NoError(t, addTempTables())
 
-	e = AddPostgresColumn(DBTest(), Person{}, "age", "integer")
+	e = AddPostgresColumn(DBTest().DB, Person{}, "age", "integer")
 	assert.NoError(t, e)
 
 	var dbcols []string
-	e = DBTest().Select(&dbcols, "SELECT Column_Name FROM information_schema.columns WHERE table_name='persons'")
+	e = DBTest().DB.Select(&dbcols, "SELECT Column_Name FROM information_schema.columns WHERE table_name='persons'")
 	assert.NoError(t, e)
 	assert.Contains(t, dbcols, "id")
 	assert.Contains(t, dbcols, "name")
@@ -44,11 +44,11 @@ func TestAddPostgresColumn(t *testing.T) {
 func TestDropPostgresColumn(t *testing.T) {
 	assert.NoError(t, addTempTables())
 
-	e = DropPostgresColumn(DBTest(), Person{}, "name")
+	e = DropPostgresColumn(DBTest().DB, Person{}, "name")
 	assert.NoError(t, e)
 
 	var dbcols []string
-	e = DBTest().Select(&dbcols, "SELECT Column_Name FROM information_schema.columns WHERE table_name='persons'")
+	e = DBTest().DB.Select(&dbcols, "SELECT Column_Name FROM information_schema.columns WHERE table_name='persons'")
 	assert.NoError(t, e)
 	assert.Contains(t, dbcols, "id")
 	assert.NotContains(t, dbcols, "name")
@@ -73,7 +73,7 @@ func TestSyncSchema(t *testing.T) {
 		Average     float64
 		Not_Include int `db:"-"`
 	}
-	e = SyncSchema(DBTest(), Person1{})
+	e = SyncSchema(DBTest().DB, Person1{})
 	assert.NoError(t, e)
 
 	type Column struct {
@@ -82,7 +82,7 @@ func TestSyncSchema(t *testing.T) {
 	}
 
 	var dbcols []string
-	e = DBTest().Select(&dbcols, "SELECT Column_Name FROM information_schema.columns WHERE table_name='persons'")
+	e = DBTest().DB.Select(&dbcols, "SELECT Column_Name FROM information_schema.columns WHERE table_name='persons'")
 	assert.NoError(t, e)
 
 	assert.Contains(t, dbcols, "family")
@@ -96,7 +96,7 @@ func TestSyncSchema(t *testing.T) {
 	assert.NotContains(t, dbcols, "not_include")
 
 	var Columns []Column
-	e = DBTest().Select(&Columns, "SELECT Column_Name,Data_Type FROM information_schema.columns WHERE table_name='persons'")
+	e = DBTest().DB.Select(&Columns, "SELECT Column_Name,Data_Type FROM information_schema.columns WHERE table_name='persons'")
 	assert.NoError(t, e)
 
 	for i := 0; i < len(Columns); i++ {
@@ -121,11 +121,11 @@ func TestSyncSchema(t *testing.T) {
 func TestAddPostgresIndex(t *testing.T) {
 	assert.NoError(t, addTempTables())
 
-	e = AddPostgresUIndex(DBTest(), Person{}, "name")
+	e = AddPostgresUIndex(DBTest().DB, Person{}, "name")
 	assert.NoError(t, e)
 
 	var result int
-	e = DBTest().Get(&result, "select 1 from pg_class t, pg_class i,    pg_index ix,    pg_attribute a where t.oid = ix.indrelid and i.oid = ix.indexrelid"+
+	e = DBTest().DB.Get(&result, "select 1 from pg_class t, pg_class i,    pg_index ix,    pg_attribute a where t.oid = ix.indrelid and i.oid = ix.indexrelid"+
 		" and a.attrelid = t.oid"+
 		" and a.attnum = ANY(ix.indkey)"+
 		" and t.relkind = 'r'"+
@@ -145,10 +145,10 @@ func TestAddPostgresForeignKey1(t *testing.T) {
 
 	//test creating foreign key successfully start
 
-	e = AddPostgresForeignKey(DBTest(), Person{}, "gender_id", Gender{}, "id", true)
+	e = AddPostgresForeignKey(DBTest().DB, Person{}, "gender_id", Gender{}, "id", true)
 	assert.NoError(t, e)
 	var result int
-	e = DBTest().Get(&result, "select 1 FROM pg_constraint WHERE conname = 'persons_gender_id_fkey'")
+	e = DBTest().DB.Get(&result, "select 1 FROM pg_constraint WHERE conname = 'persons_gender_id_fkey'")
 	assert.NoError(t, e)
 	assert.Equal(t, 1, result)
 	//test creating foreign key successfully end
@@ -158,15 +158,15 @@ func TestAddPostgresForeignKey1(t *testing.T) {
 	genderColl.Create(SystemToken, nil, &gender)
 	assert.NoError(t, e)
 
-	_, e = DBTest().Exec("insert into persons(id,name,gender_id) values(1,'mahsa',1);")
+	_, e = DBTest().DB.Exec("insert into persons(id,name,gender_id) values(1,'mahsa',1);")
 	assert.NoError(t, e)
 
 	//remove gender for test cascade delete
-	_, e = DBTest().Exec("delete from gender where id=1")
+	_, e = DBTest().DB.Exec("delete from gender where id=1")
 	assert.NoError(t, e)
 
 	result = 0
-	e = DBTest().Get(&result, "select count(1) FROM persons")
+	e = DBTest().DB.Get(&result, "select count(1) FROM persons")
 	assert.NoError(t, e)
 	//the person should be deleted because the key is cascade
 	assert.Equal(t, 0, result)
@@ -180,10 +180,10 @@ func TestAddPostgresForeignKey2(t *testing.T) {
 	//not cascade delete
 
 	//test creating foreign key successfully start
-	e = AddPostgresForeignKey(DBTest(), Person{}, "gender_id", Gender{}, "id", false)
+	e = AddPostgresForeignKey(DBTest().DB, Person{}, "gender_id", Gender{}, "id", false)
 	assert.NoError(t, e)
 	var result int
-	e = DBTest().Get(&result, "select 1 FROM pg_constraint WHERE conname = 'persons_gender_id_fkey'")
+	e = DBTest().DB.Get(&result, "select 1 FROM pg_constraint WHERE conname = 'persons_gender_id_fkey'")
 	assert.NoError(t, e)
 	assert.Equal(t, 1, result)
 	//test creating foreign key successfully end
@@ -192,15 +192,15 @@ func TestAddPostgresForeignKey2(t *testing.T) {
 	genderColl.Create(SystemToken, nil, &gender)
 	assert.NoError(t, e)
 
-	_, e = DBTest().Exec("insert into persons(id,name,gender_id) values(1,'mahsa',1);")
+	_, e = DBTest().DB.Exec("insert into persons(id,name,gender_id) values(1,'mahsa',1);")
 	assert.NoError(t, e)
 
 	//remove gender for test cascade delete
-	_, e = DBTest().Exec("delete from gender where id=1")
+	_, e = DBTest().DB.Exec("delete from gender where id=1")
 	assert.Error(t, e, "pq: update or delete on table \"gender\" violates foreign key constraint \"persons_gender_id_fkey\" on table \"persons\"")
 
 	result = 0
-	e = DBTest().Get(&result, "select count(1) FROM persons")
+	e = DBTest().DB.Get(&result, "select count(1) FROM persons")
 	assert.NoError(t, e)
 	//the person should not be deleted because the gender_id  key is not cascade
 	assert.Equal(t, 1, result)
