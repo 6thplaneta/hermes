@@ -70,7 +70,7 @@ func Test_ChangePassword(t *testing.T) {
 	router.ServeHTTP(response, request)
 
 	assert.Equal(t, http.StatusBadRequest, response.Code)
-	assert.Equal(t, "\"Password is not correct!\"\n", response.Body.String())
+	assert.Equal(t, "\"PasswordError: Password is not correct!\"\n", response.Body.String())
 
 	//corect password test
 	p = Password{}
@@ -95,6 +95,7 @@ func Test_ChangePassword(t *testing.T) {
 }
 
 func Test_RequestPasswordToken(t *testing.T) {
+
 	cont := NewAgentController(AgentColl, "")
 
 	gin.SetMode(gin.TestMode)
@@ -108,14 +109,15 @@ func Test_RequestPasswordToken(t *testing.T) {
 	response := httptest.NewRecorder()
 	router.ServeHTTP(response, request)
 	assert.Equal(t, http.StatusNotFound, response.Code)
-	assert.Equal(t, "\"Resource not found!\"\n", response.Body.String())
+	assert.Equal(t, "\"NotFound: Resource not found!\"\n", response.Body.String())
 
 	//exist user
 	request, _ = http.NewRequest("GET", "/forgetPassword/m.ghoreishi1@gmail.com", nil)
+	request.Header.Set("Authorization", SystemToken)
 	response = httptest.NewRecorder()
 	router.ServeHTTP(response, request)
 	assert.Equal(t, http.StatusOK, response.Code)
-
+	// time.Sleep(time.Minute * 10)
 }
 
 func Test_ChangePasswordByToken(t *testing.T) {
@@ -136,11 +138,12 @@ func Test_ChangePasswordByToken(t *testing.T) {
 	contentReader := bytes.NewReader(sJson)
 
 	request, _ := http.NewRequest("POST", "/changePasswordByToken/"+uuid.NewV4().String(), contentReader)
+	request.Header.Set("Authorization", SystemToken)
 	response := httptest.NewRecorder()
 	router.ServeHTTP(response, request)
 
-	assert.Equal(t, http.StatusNotFound, response.Code)
-	assert.Equal(t, "\"Resource not found!\"\n", response.Body.String())
+	assert.Equal(t, http.StatusForbidden, response.Code)
+	assert.Equal(t, "\"InvalidToken: Invalid token!\"\n", response.Body.String())
 
 	//existing token test
 
@@ -153,7 +156,7 @@ func Test_ChangePasswordByToken(t *testing.T) {
 	sJson, _ = json.Marshal(p)
 	contentReader = bytes.NewReader(sJson)
 
-	request, _ = http.NewRequest("POST", "/changePasswordByToken/"+_token[0], contentReader)
+	request, _ = http.NewRequest("POST", "/changePasswordByToken/"+_token[0]+"?email=m.ghoreishi1@gmail.com", contentReader)
 	response = httptest.NewRecorder()
 	router.ServeHTTP(response, request)
 
@@ -186,7 +189,7 @@ func Test_Login_Controller(t *testing.T) {
 	router.ServeHTTP(response, request)
 
 	assert.Equal(t, http.StatusNotFound, response.Code)
-	assert.Equal(t, "\"Resource not found!\"\n", response.Body.String())
+	assert.Equal(t, "\"NotFound: Resource not found!\"\n", response.Body.String())
 
 	//wrong password
 	agent = &Agent{}
@@ -204,7 +207,7 @@ func Test_Login_Controller(t *testing.T) {
 	router.ServeHTTP(response, request)
 
 	assert.Equal(t, http.StatusNotFound, response.Code)
-	assert.Equal(t, "\"Resource not found!\"\n", response.Body.String())
+	assert.Equal(t, "\"NotFound: Resource not found!\"\n", response.Body.String())
 
 	//correct email password
 	DBTest().DB.Exec(" update agents set is_active=true where identity='m.ghoreishi1@gmail.com' ")
@@ -260,4 +263,6 @@ func Test_Logout(t *testing.T) {
 }
 func Test_AgentController_End(t *testing.T) {
 	rmTempTables()
+	DBTest().DB.Exec("deallocate all;")
+
 }

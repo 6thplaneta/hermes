@@ -210,7 +210,7 @@ func PopulateCollection(token string, dbInstance *sqlx.DB, collection interface{
 			params.List["id"] = Filter{Type: "array", Value: ids, FieldType: "int"}
 
 			pg := &Paging{-1, 0, "", ""}
-			result, err := CollectionsMap[fieldType].List(token, params, pg, innerPopulate, "")
+			result, err := CollectionsMap[fieldType].List(SystemToken, params, pg, innerPopulate, "")
 
 			popx := reflect.ValueOf(result)
 			if popx.Kind() == reflect.Ptr {

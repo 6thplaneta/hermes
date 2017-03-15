@@ -80,8 +80,8 @@ func TestCastToStr(t *testing.T) {
 	assert.Equal(t, "-2.5", CastToStr(-2.5, "float64", ""))
 	assert.Equal(t, "2.5", CastToStr(2.5, "float64", ""))
 	assert.Equal(t, "2.5", CastToStr(+2.5, "float64", ""))
-	assert.Equal(t, "'hello!'", CastToStr("hello!", "string", ""))
-	assert.Equal(t, "'1988-05-19T02:23:21+00:00'", CastToStr(time.Date(1988, 05, 19, 02, 23, 21, 0, time.UTC), "time", ""))
+	assert.Equal(t, "hello!", CastToStr("hello!", "string", ""))
+	assert.Equal(t, "1988-05-19T02:23:21+00:00", CastToStr(time.Date(1988, 05, 19, 02, 23, 21, 0, time.UTC), "time", ""))
 }
 
 func TestCastArrToStr(t *testing.T) {

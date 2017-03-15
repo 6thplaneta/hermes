@@ -451,5 +451,6 @@ func Test_Delete(t *testing.T) {
 
 func Test_Collection_End(t *testing.T) {
 	assert.NoError(t, rmTempTables())
+	DBTest().DB.Exec("deallocate all;")
 
 }

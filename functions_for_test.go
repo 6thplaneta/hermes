@@ -132,6 +132,7 @@ func addTempTables() error {
 }
 
 func rmTempTables() error {
+
 	//remove table
 	_, e = DBTest().DB.Exec("drop table persons;drop table students;drop table supervisors;drop table gender;drop table sex;drop table classes;drop table student_class;drop table agents;drop table agent_tokens;drop table devices;")
 	return e
@@ -198,7 +199,16 @@ func addTempCollections() error {
 	return nil
 }
 
+func DBTestDeallocate() {
+	for {
+
+		time.Sleep(time.Second)
+		DBTest().DB.Exec("deallocate all;")
+	}
+
+}
 func TestMain(m *testing.M) {
+	// go DBTestDeallocate()
 	//start
 	application = NewApp("conf.yml")
 	application.InitLogs("")

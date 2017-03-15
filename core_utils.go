@@ -320,7 +320,7 @@ func RandStringRunes(n int) string {
 func DeallocateStatements() {
 	for {
 
-		time.Sleep(time.Minute)
+		time.Sleep(time.Second)
 		application.DataSrc.DB.Exec("deallocate all;")
 	}
 }

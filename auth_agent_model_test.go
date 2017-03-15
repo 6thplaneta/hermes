@@ -11,7 +11,7 @@ func Test_Agent_Start(t *testing.T) {
 }
 func TestCreateAgent(t *testing.T) {
 
-	agent, err := AgentColl.Create(SystemToken, nil, &Agent{Identity: "m.ghoreishi1@gmail.com", Password: ""})
+	agent, err := AgentColl.Create(SystemToken, nil, &Agent{Identity: "m.ghoreishi1@gmail.com", Password: "", Is_Active: true})
 	assert.Error(t, err, "NotValid")
 
 	//lenght of passowrd must be greater than 6
@@ -19,7 +19,7 @@ func TestCreateAgent(t *testing.T) {
 	assert.Error(t, err, "NotValid")
 
 	//lenght of passowrd must be greater than 6
-	agent, err = AgentColl.Create(SystemToken, nil, &Agent{Identity: "m.ghoreishi1@gmail.com", Password: "123456"})
+	agent, err = AgentColl.Create(SystemToken, nil, &Agent{Identity: "m.ghoreishi1@gmail.com", Password: "123456", Is_Active: true})
 	assert.NoError(t, err)
 	ragent := agent.(*Agent)
 	assert.Equal(t, 1, ragent.Id)
@@ -31,7 +31,8 @@ func TestCreateAgent(t *testing.T) {
 
 func Test_UpdatePasswordByToken(t *testing.T) {
 
-	AgentTokenColl := AgentTokenCollection{}
+	// AgentTokenColl := AgentTokenCollection{}
+	AgentTokenColl, err := NewAgentTokenCollection(AgentToken{}, DBTest())
 
 	token, err := AgentTokenColl.CreateToken(NewToken(1, "password"))
 	assert.NoError(t, err)
@@ -127,7 +128,7 @@ func Test_Login(t *testing.T) {
 	agent = Agent{}
 	agent.Identity = "m.ghoreishi1@gmail.com"
 	agent.Password = "mahsa1"
-
+	agent.Is_Active = true
 	agent.Device.Platform = "ios"
 	agent.Device.Ip = "19.168.20.2"
 	agent.Device.Ip = "122356789"
@@ -139,4 +140,6 @@ func Test_Login(t *testing.T) {
 }
 func Test_Agent_End(t *testing.T) {
 	rmTempTables()
+	DBTest().DB.Exec("deallocate all;")
+
 }

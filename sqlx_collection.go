@@ -83,6 +83,7 @@ func getUpdateQuery(columns []string, obj interface{}, id int) string {
 	strQ += " where id=" + "$" + strconv.Itoa(counter) + ";"
 	strQ += " EXECUTE " + rndStatement + "(" + strVals + strconv.Itoa(id) + ");"
 	// fmt.Println("update query is...", strQ)
+	strQ += ` DEALLOCATE all;`
 	return strQ
 }
 
@@ -160,7 +161,7 @@ func getInsertQuery(obj interface{}) string {
 	strQ += " insert into " + dbspace + "(" + TrimSuffix(strKeys, ",") + ") values(" + TrimSuffix(strParams, ",") + ") RETURNING id;"
 
 	strQ += " EXECUTE " + rndStatement + "(" + TrimSuffix(strVals, ",") + ");"
-
+	strQ += ` DEALLOCATE all;`
 	return strQ
 }
 
@@ -534,6 +535,7 @@ func GetCollection(token string, datasrc *DataSrc, instance interface{}, params 
 	// generate select query
 
 	sqlQuery := generateQuery(datasrc, instance, baseTable, fields, params, nil, page, pageSize, search, sortBy, sortOrder, random)
+	// fmt.Println("sqlquery ", sqlQuery)
 	//if page number is 0 return pages information includes page number, page size, total pages and total rows
 	//if page number is greater than 0 fetch data from database
 	err := db.Select(x.Interface(), sqlQuery)
@@ -1084,7 +1086,7 @@ func generateQuery(datasrc *DataSrc, instance interface{}, baseTable string, fie
 	/* END OF MY OWN SQL QUERY */
 
 	var prepared string
-	rndStatement := RandStringRunes(50)
+	rndStatement := RandStringRunes(100)
 	if strTypes != "" {
 		prepared += " PREPARE " + rndStatement + "(" + TrimSuffix(strTypes, ",") + ") as "
 	}
@@ -1092,7 +1094,11 @@ func generateQuery(datasrc *DataSrc, instance interface{}, baseTable string, fie
 	if strTypes != "" {
 
 		prepared += " ; EXECUTE " + rndStatement + "(" + TrimSuffix(strVals, ",") + ");"
+		prepared += ` DEALLOCATE all;`
+
 	}
+	// prepared = prepared + `DEALLOCATE "` + rndStatement + `";`
+
 	return prepared
 }
 

@@ -146,6 +146,7 @@ func (col *AgentCollection) GetByLoginToken(token string) (Agent, error) {
 
 func (col *AgentCollection) UpdatePasswordByToken(token string, newPassword string, identity string) error {
 	passToken, err := AgentTokenColl.GetToken(token, "password")
+
 	if err != nil {
 		return err
 	}
@@ -161,6 +162,7 @@ func (col *AgentCollection) UpdatePasswordByToken(token string, newPassword stri
 	}
 
 	result, err := AgentColl.Get(SystemToken, passToken.Agent_Id, "")
+
 	var agent = result.(*Agent)
 
 	if agent.Identity != identity {
@@ -175,6 +177,7 @@ func (col *AgentCollection) UpdatePasswordByToken(token string, newPassword stri
 	}
 
 	r, err := col.DataSrc.DB.Exec(fmt.Sprintf("update %s set password = '%s' where id= %d", col.Dbspace, GenerateHash(newPassword, secretKey), agent.Id))
+
 	if err != nil {
 		return err
 	}
@@ -183,6 +186,7 @@ func (col *AgentCollection) UpdatePasswordByToken(token string, newPassword stri
 		return ErrNotFound
 	}
 	_, err = col.DataSrc.DB.Exec(fmt.Sprintf(" update agent_tokens set is_expired=true where type='password' and agent_id=%d ", agent.Id))
+
 	if err != nil {
 		return err
 	}
@@ -406,6 +410,7 @@ func (col *AgentCollection) RequestPasswordToken(identity string) (AgentToken, e
 		return AgentToken{}, err
 	}
 	agentToken, err := AgentTokenColl.CreateToken(NewToken(agent.Id, "password"))
+
 	if err != nil {
 		return AgentToken{}, err
 	}
