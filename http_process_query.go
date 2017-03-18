@@ -1,7 +1,7 @@
 package hermes
 
 import (
-	// "fmt"
+	"fmt"
 	"net/url"
 	"strings"
 )
@@ -17,7 +17,9 @@ func ReadHttpParams(vals url.Values, instance interface{}) *Params {
 	// instance, _ := cont.Coll.GetInstance()
 	params := NewParams(instance)
 	for k, strParam := range vals {
+
 		strValue := strParam[0]
+
 		if strValue == "" {
 			continue
 		}
@@ -31,10 +33,14 @@ func ReadHttpParams(vals url.Values, instance interface{}) *Params {
 			continue
 		}
 		kk := strings.Split(k, "$")[0]
+		if k == "name" {
+			fmt.Println("------------------kk", kk)
+		}
 		key := GetFieldJsonIndirectByInst(instance, kk)
 		// fmt.Println("checking key in params", k, "computed:", key)
 		//all filters should exist in struct
 		isExist, typeOfField := GetFieldExistanceAndType(instance, key)
+
 		if !isExist {
 			continue
 		}

@@ -345,15 +345,16 @@ func (col *Collection) Update(token string, id int, obj interface{}) error {
 	if len(editables) == 0 {
 		return nil
 	}
-	result, err := col.DataSrc.DB.Exec(getUpdateQuery(editables, obj, id))
-
+	_, err := col.DataSrc.DB.Exec(getUpdateQuery(editables, obj, id))
 	if err != nil {
 		return err
 	}
-	count, _ := result.RowsAffected()
-	if count == 0 {
-		return ErrNotFound
-	}
+	// count, _ := result.RowsAffected()
+	// fmt.Println("******************count********** ", count)
+
+	// if count == 0 {
+	// 	return ErrNotFound
+	// }
 	return nil
 }
 

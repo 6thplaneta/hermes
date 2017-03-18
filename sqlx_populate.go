@@ -88,11 +88,12 @@ func PopulateStruct(token string, dbInstance *sqlx.DB, value interface{}, popula
 
 	structName := strings.ToLower(rval.Type().Name())
 	for strPopulate, innerPopulate := range arrPopulate {
-		strPopulate = GetFieldJsonByInst(value, strPopulate)
 
+		strPopulate = GetFieldJsonByInst(value, strPopulate)
 		// innerPopulate = GetTitle(innerPopulate)
 
 		fieldType, err := GetFieldType(value, strPopulate)
+
 		if err != nil {
 			return err
 		}

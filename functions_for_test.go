@@ -1,6 +1,7 @@
 package hermes
 
 import (
+	// "fmt"
 	"github.com/jmoiron/sqlx"
 	"os"
 	"reflect"
@@ -10,7 +11,7 @@ import (
 
 var instance *DataSrc
 
-var sclassColl, sexColl, genderColl, classColl, studentColl, supervisorColl *Collection
+var sclassColl, sexColl, genderColl, classColl, studentColl, supervisorColl, personColl *Collection
 var e error
 
 // type DataSrc struct {
@@ -34,56 +35,56 @@ func DBTest() *DataSrc {
 }
 
 type Person struct {
-	Id          int `hermes:"dbspace:persons"`
-	Name        string
-	Middle_Name string `db:"-"`
-	Gender_Id   int
-	Gender      Gender `db:"-" hermes:"one2one:Person"`
-	Student_Id  int
-	Student     Student `db:"-" hermes:"one2one:Person"`
+	Id          int     `json:"id" hermes:"dbspace:persons"`
+	Name        string  `json:"name"`
+	Middle_Name string  `json:"middle_name" db:"-"`
+	Gender_Id   int     `json:"gender_id"`
+	Gender      Gender  `json:"gender" db:"-" hermes:"one2one"`
+	Student_Id  int     `json:"student_id"`
+	Student     Student `json:"student" db:"-" hermes:"one2one"`
 }
 
 type Gender struct {
-	Id    int `hermes:"dbspace:gender"`
-	Title string
+	Id    int    `json:"id" hermes:"dbspace:gender"`
+	Title string `json:"title"`
 }
 
 type Sex struct {
-	Id    int `hermes:"dbspace:sex"`
-	Title string
+	Id    int    `json:"id" hermes:"dbspace:sex"`
+	Title string `json:"title"`
 }
 
 type Class struct {
-	Id       int `hermes:"dbspace:classes"`
-	Title    string
-	Students []Student `db:"-" hermes:"many2many:Student_Class"`
+	Id       int       `json:"id" hermes:"dbspace:classes"`
+	Title    string    `json:"title"`
+	Students []Student `db:"-" json:"students" hermes:"many2many:Student_Class"`
 }
 
 type Supervisor struct {
-	Id        int `hermes:"dbspace:supervisors"`
-	Name      string
-	Gender_Id int
-	Gender    Gender    `db:"-" hermes:"one2one:Supervisor"`
-	Students  []Student `db:"-" hermes:"one2many:Supervisor"`
+	Id        int       `json:"id" hermes:"dbspace:supervisors"`
+	Name      string    `json:"name"`
+	Gender_Id int       `json:"gender_id"`
+	Gender    Gender    `db:"-" json:"gender" hermes:"one2one:Supervisor"`
+	Students  []Student `db:"-" json:"students" hermes:"one2many:Supervisor"`
 }
 
 type Student struct {
-	Id            int    `hermes:"dbspace:students"`
-	Title         string `hermes:"editable,searchable"`
-	Sex_Id        int
-	Sex           Sex `db:"-" hermes:"one2one:Student"`
-	Gender_Id     int
-	Gender        Gender `db:"-" hermes:"many2one"`
-	Supervisor_Id int
-	Supervisor    Supervisor `db:"-" hermes:"one2one:Student"`
-	Age           int
-	Login_Date    time.Time `hermes:"type:time"`
-	Classes       []Class   `db:"-" hermes:"many2many:Student_Class"`
+	Id            int        `json:"id" hermes:"dbspace:students"`
+	Title         string     `json:"title" hermes:"editable,searchable"`
+	Sex_Id        int        `json:"sex_id"`
+	Sex           Sex        `json:"sex" db:"-" hermes:"one2one:Student"`
+	Gender_Id     int        `json:"gender_id"`
+	Gender        Gender     `json:"gender" db:"-" hermes:"many2one"`
+	Supervisor_Id int        `json:"supervisor_id"`
+	Supervisor    Supervisor `json:"supervisor" db:"-" hermes:"one2one:Student"`
+	Age           int        `json:"age"`
+	Login_Date    time.Time  `json:"login_date" hermes:"type:time"`
+	Classes       []Class    `json:"classes" db:"-" hermes:"many2many:Student_Class"`
 }
 type Student_Class struct {
-	Id         int `hermes:"dbspace:student_class"`
-	Class_Id   int
-	Student_Id int
+	Id         int `json:"id" hermes:"dbspace:student_class"`
+	Class_Id   int `json:"class_id"`
+	Student_Id int `json:"student_id"`
 }
 
 func addTempTables() error {
@@ -196,6 +197,13 @@ func addTempCollections() error {
 	}
 	typ = reflect.TypeOf(Supervisor{})
 	CollectionsMap[typ] = supervisorColl
+
+	personColl, e = NewCollection(Person{}, DBTest())
+	if e != nil {
+		return e
+	}
+	typ = reflect.TypeOf(Person{})
+	CollectionsMap[typ] = personColl
 	return nil
 }
 
@@ -208,6 +216,9 @@ func DBTestDeallocate() {
 
 }
 func TestMain(m *testing.M) {
+	// person := Person{}
+	// FillJsonMap(person)
+
 	// go DBTestDeallocate()
 	//start
 	application = NewApp("conf.yml")

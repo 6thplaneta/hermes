@@ -45,17 +45,17 @@ func TestValidateStruct(t *testing.T) {
 	}
 	var person Person
 	person = Person{Id: 1, Name: "mahsa", Family: "ghoreishi", Age: 27}
-	strErrors := ValidateStruct(person)
-	assert.Equal(t, strErrors, "Email is required!")
+	errs := ValidateStruct(person)
+	assert.Equal(t, errs.Error(), "NotValid: Email is required!")
 
 	//incorrect email format
 	person.Email = "m.ghoreishi1"
-	strErrors = ValidateStruct(person)
-	assert.Equal(t, strErrors, "Email should be as email format!")
+	errs = ValidateStruct(person)
+	assert.Equal(t, errs.Error(), "NotValid: Email should be as email format!")
 
 	person.Email = "m.ghoreishi1@gmail.com"
 	person.Age = 0
-	strErrors = ValidateStruct(person)
-	assert.Equal(t, strErrors, "Age is required!")
+	errs = ValidateStruct(person)
+	assert.Equal(t, errs.Error(), "NotValid: Age is required!")
 
 }

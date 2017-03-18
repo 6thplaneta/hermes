@@ -145,9 +145,7 @@ func TestGetTagValue(t *testing.T) {
 	var val string
 	val, _ = GetTagValue(user, "Login_Date", "hermes", "type")
 	assert.Equal(t, "time", val)
-	//case insensitive
-	val, _ = GetTagValue(user, "login_date", "hermes", "type")
-	assert.Equal(t, "time", val)
+
 	val, _ = GetTagValue(user, "email", "hermes", "type")
 	assert.Equal(t, "", val)
 	val, _ = GetTagValue(user, "notexistfield", "hermes", "type")

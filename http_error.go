@@ -14,6 +14,7 @@ func HandleHttpError(c *gin.Context, err error, logger *Logger) {
 	// all errors are internal unless equal specified errors or have Error structure and NotValid/BadRequest Key
 	statusCode := http.StatusInternalServerError
 	if err == ErrNotFound {
+
 		statusCode = http.StatusNotFound
 	} else if err == ErrForbidden || err == ErrTokenInvalid {
 		statusCode = http.StatusForbidden

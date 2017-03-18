@@ -95,6 +95,7 @@ func GetFieldExistanceAndType(val interface{}, name string) (bool, string) {
 		if i == 0 {
 
 			typeField, fieldExists = tval.FieldByName(arrFields[i])
+
 		} else {
 			if typeField.Type.Kind() == reflect.Slice {
 				typeField, fieldExists = typeField.Type.Elem().FieldByName(arrFields[i])
@@ -156,6 +157,7 @@ func ConcatArrayToString(instance interface{}, feild, spliter string) string {
 * @return	reflect.Type 			type of feild
  */
 func GetFieldType(instance interface{}, name string) (reflect.Type, error) {
+
 	rval := reflect.ValueOf(instance)
 	if rval.Kind() == reflect.Ptr {
 		rval = rval.Elem()

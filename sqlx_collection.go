@@ -535,6 +535,10 @@ func GetCollection(token string, datasrc *DataSrc, instance interface{}, params 
 	// generate select query
 
 	sqlQuery := generateQuery(datasrc, instance, baseTable, fields, params, nil, page, pageSize, search, sortBy, sortOrder, random)
+	if paramsList["mahhhhhsa"].Value != nil {
+		fmt.Println("sqlquery", sqlQuery)
+	}
+
 	// fmt.Println("sqlquery ", sqlQuery)
 	//if page number is 0 return pages information includes page number, page size, total pages and total rows
 	//if page number is greater than 0 fetch data from database
