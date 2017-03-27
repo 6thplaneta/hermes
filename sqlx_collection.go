@@ -535,11 +535,7 @@ func GetCollection(token string, datasrc *DataSrc, instance interface{}, params 
 	// generate select query
 
 	sqlQuery := generateQuery(datasrc, instance, baseTable, fields, params, nil, page, pageSize, search, sortBy, sortOrder, random)
-	if paramsList["mahhhhhsa"].Value != nil {
-		fmt.Println("sqlquery", sqlQuery)
-	}
 
-	// fmt.Println("sqlquery ", sqlQuery)
 	//if page number is 0 return pages information includes page number, page size, total pages and total rows
 	//if page number is greater than 0 fetch data from database
 	err := db.Select(x.Interface(), sqlQuery)
@@ -807,13 +803,21 @@ func getCluaseValues(fieldName string, param Filter) (string, string) {
 	con := ""
 	switch param.Type {
 	case "array":
-		strVal := prepareValueArr(param.Value, param.FieldType, "")
-		if strVal != "" {
-			con = prepareValueArr(param.Value, param.FieldType, "")
-			return "array[" + con + "]", ""
-		}
+
+		con = prepareValueArr(param.Value, param.FieldType, "")
+		return "array[" + con + "]", ""
 	case "range":
+
 		rangeFilter, _ := param.Value.(RangeFilter)
+		if rangeFilter.From != nil && rangeFilter.To != nil {
+
+			fromval := prepareValue(rangeFilter.From, param.FieldType, "")
+			toval := prepareValue(rangeFilter.To, param.FieldType, "")
+			con = fromval
+			con1 := toval
+			return con, con1
+
+		}
 		if rangeFilter.From != nil {
 			fromval := prepareValue(rangeFilter.From, param.FieldType, "")
 			con = fromval
@@ -825,14 +829,7 @@ func getCluaseValues(fieldName string, param Filter) (string, string) {
 			return con, ""
 
 		}
-		if rangeFilter.From != nil && rangeFilter.To != nil {
-			fromval := prepareValue(rangeFilter.From, param.FieldType, "")
-			toval := prepareValue(rangeFilter.To, param.FieldType, "")
-			con = fromval
-			con1 := toval
-			return con, con1
 
-		}
 	case "exact":
 		con = prepareValue(param.Value, param.FieldType, "")
 		return con, ""
@@ -1010,14 +1007,24 @@ func generateQuery(datasrc *DataSrc, instance interface{}, baseTable string, fie
 
 		}
 
+		rangeFilter, _ := v.Value.(RangeFilter)
+
 		if v.Type == "array" {
+
 			strTypes = strTypes + ChangeGoTypeToPostgres(v.FieldType, v.DBType) + "[],"
+
+		} else if v.Type == "range" && rangeFilter.From != nil && rangeFilter.To != nil {
+
+			//add two types for prepared statement parameters
+			strTypes = strTypes + ChangeGoTypeToPostgres(v.FieldType, v.DBType) + ","
+			strTypes = strTypes + ChangeGoTypeToPostgres(v.FieldType, v.DBType) + ","
 
 		} else {
 			strTypes = strTypes + ChangeGoTypeToPostgres(v.FieldType, v.DBType) + ","
 
 		}
 		val1, val2 := getCluaseValues(fieldName, v)
+
 		if val1 != "" {
 			strVals = strVals + val1 + ","
 

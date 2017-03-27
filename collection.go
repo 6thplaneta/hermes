@@ -536,6 +536,7 @@ func (col *Collection) Rel(token string, origin_id int, field string, arr_dest [
 		return ErrForbidden
 
 	}
+
 	field = GetFieldJson(col, field)
 	ival := reflect.ValueOf(col.Instance)
 	if ival.Kind() == reflect.Ptr {

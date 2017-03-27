@@ -9,7 +9,7 @@ import (
 func AuthMiddleware(escapes []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		if authEnabled == false {
+		if authEnabled == false || strings.Contains(c.Request.Method, "OPTIONS") {
 			c.Next()
 			return
 		}

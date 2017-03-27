@@ -2,7 +2,7 @@ package hermes
 
 import (
 	"encoding/json"
-	"fmt"
+	// "fmt"
 	"gopkg.in/olivere/elastic.v3"
 	"reflect"
 	"strconv"
@@ -48,7 +48,7 @@ func DoIndexDocument(searchInstance *SearchClient, obj interface{}) error {
 	if errEncode != nil {
 		return errEncode
 	}
-	fmt.Println("search client", searchInstance)
+
 	id := strconv.Itoa(val.FieldByName("Id").Interface().(int))
 	_, errIndex := searchInstance.Elastic.Index().
 		Index(searchInstance.IndexName).
@@ -57,8 +57,6 @@ func DoIndexDocument(searchInstance *SearchClient, obj interface{}) error {
 		BodyString(string(jsondata)).
 		Refresh(true).
 		Do()
-
-	fmt.Println("errIndex", errIndex)
 
 	if errIndex != nil {
 		return errIndex

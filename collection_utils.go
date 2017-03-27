@@ -16,6 +16,8 @@ func GetFieldJsonByInst(instance interface{}, json string) string {
 	if tp.Kind() == reflect.Ptr {
 		tp = tp.Elem()
 	}
+	// fmt.Println("field***********", CollectionsJsonMap[tp])
+
 	return CollectionsJsonMap[tp][json]
 }
 

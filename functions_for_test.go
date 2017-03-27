@@ -35,8 +35,15 @@ func DBTest() *DataSrc {
 }
 
 type Person struct {
-	Id          int     `json:"id" hermes:"dbspace:persons"`
-	Name        string  `json:"name"`
+	Id            int       `json:"id" hermes:"dbspace:persons"`
+	Name          string    `json:"name"`
+	Family        string    `json:"family"`
+	Email         string    `json:"email"`
+	Register_Date time.Time `hermes:"type:time" json:"register_date"`
+	Age           int       `json:"age"`
+	Child_Count   int       `json:"child_count"`
+	Male          bool      `json:"male"`
+
 	Middle_Name string  `json:"middle_name" db:"-"`
 	Gender_Id   int     `json:"gender_id"`
 	Gender      Gender  `json:"gender" db:"-" hermes:"one2one"`
@@ -64,19 +71,19 @@ type Supervisor struct {
 	Id        int       `json:"id" hermes:"dbspace:supervisors"`
 	Name      string    `json:"name"`
 	Gender_Id int       `json:"gender_id"`
-	Gender    Gender    `db:"-" json:"gender" hermes:"one2one:Supervisor"`
-	Students  []Student `db:"-" json:"students" hermes:"one2many:Supervisor"`
+	Gender    Gender    `db:"-" json:"gender" hermes:"one2one"`
+	Students  []Student `db:"-" json:"students" hermes:"one2many"`
 }
 
 type Student struct {
 	Id            int        `json:"id" hermes:"dbspace:students"`
 	Title         string     `json:"title" hermes:"editable,searchable"`
 	Sex_Id        int        `json:"sex_id"`
-	Sex           Sex        `json:"sex" db:"-" hermes:"one2one:Student"`
+	Sex           Sex        `json:"sex" db:"-" hermes:"one2one"`
 	Gender_Id     int        `json:"gender_id"`
 	Gender        Gender     `json:"gender" db:"-" hermes:"many2one"`
 	Supervisor_Id int        `json:"supervisor_id"`
-	Supervisor    Supervisor `json:"supervisor" db:"-" hermes:"one2one:Student"`
+	Supervisor    Supervisor `json:"supervisor" db:"-" hermes:"one2one"`
 	Age           int        `json:"age"`
 	Login_Date    time.Time  `json:"login_date" hermes:"type:time"`
 	Classes       []Class    `json:"classes" db:"-" hermes:"many2many:Student_Class"`

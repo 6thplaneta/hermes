@@ -94,7 +94,6 @@ func UnPopulate(token string, trans *sql.Tx, value interface{}) error {
 			many2many, _ := GetTagValueByFeild(structfield, "hermes", "many2many")
 			_, isOne2many := GetTagValueByFeild(structfield, "hermes", "one2many")
 			fkey, _ := GetTagValueByFeild(structfield, "hermes", "fkey")
-
 			if many2many != "" {
 				mkey, _ := GetTagValueByFeild(structfield, "hermes", "mkey")
 				if mkey == "" {
@@ -143,8 +142,10 @@ func UnPopulate(token string, trans *sql.Tx, value interface{}) error {
 				for i := 0; i < obj.Len(); i++ {
 					mainobj := obj.Index(i)
 					mid := int(mainobj.FieldByName("Id").Int())
+
 					ival := mainobj.Addr().Interface()
 					if mid == 0 {
+
 						// create object
 						mainobj.FieldByName(fkey).Set(rval.FieldByName("Id"))
 						_, err := CollectionsMap[mainobj.Type()].Create(token, trans, ival)

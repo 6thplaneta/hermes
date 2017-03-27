@@ -145,38 +145,26 @@ func Test_List(t *testing.T) {
 	assert.Equal(t, 2, len(arr))
 
 	//filter range test (from-to) not exist
-	//todo test
-	// params = NewParams(Student{})
+	params = NewParams(Student{})
 
-	// params.AddFilter("age", Filter{Type: "range", Value: RangeFilter{From: 28, To: 40}, FieldType: "int"})
-	// result, e = studentColl.List(SystemToken, params, &pg, "", "")
-	// assert.NoError(t, e)
+	params.AddFilter("age", Filter{Type: "range", Value: RangeFilter{From: 28, To: 40}, FieldType: "int"})
+	result, e = studentColl.List(SystemToken, params, &pg, "", "")
+	assert.NoError(t, e)
 
-	// arr = *result.(*[]Student)
-	// assert.Equal(t, 0, len(arr))
+	arr = *result.(*[]Student)
+	assert.Equal(t, 0, len(arr))
 
 	//filter range test (from-to) exist
-	//todo test
+	params = NewParams(Student{})
 
-	// params = NewParams(Student{})
+	params.AddFilter("age", Filter{Type: "range", Value: RangeFilter{From: 20, To: 45}, FieldType: "int"})
+	result, e = studentColl.List(SystemToken, params, &pg, "", "")
+	assert.NoError(t, e)
 
-	// params.AddFilter("age", Filter{Type: "range", Value: RangeFilter{From: 20, To: 45}, FieldType: "int"})
-	// result, e = studentColl.List(SystemToken, params, &pg, "", "")
-	// assert.NoError(t, e)
-
-	// arr = *result.(*[]Student)
-	// assert.Equal(t, 2, len(arr))
+	arr = *result.(*[]Student)
+	assert.Equal(t, 2, len(arr))
 
 	//filter array test (in)
-	//todo test
-	// params = NewParams(Student{})
-
-	// params.AddFilter("age", Filter{Type: "array", Value: []int{}, FieldType: "int"})
-	// result, e = studentColl.List(SystemToken, params, &pg, "", "")
-	// assert.NoError(t, e)
-
-	// arr = *result.(*[]Student)
-	// assert.Equal(t, 2, len(arr))
 
 	params = NewParams(Student{})
 	params.AddFilter("age", Filter{Type: "array", Value: []int{27}, FieldType: "int"})
@@ -378,71 +366,70 @@ func Test_Sort(t *testing.T) {
 
 }
 
-//todo test
-// func Test_Rel(t *testing.T) {
-// 	//many 2 one test
-// 	//change student gender from 1 to 2(female to male)
-// 	result, e := studentColl.Get(SystemToken, 1, "")
-// 	assert.NoError(t, e)
-// 	stu := result.(*Student)
-// 	assert.Equal(t, 1, stu.Gender_Id)
+func Test_Rel(t *testing.T) {
+	//many 2 one test
+	//change student gender from 1 to 2(female to male)
+	result, e := studentColl.Get(SystemToken, 1, "")
+	assert.NoError(t, e)
+	stu := result.(*Student)
+	assert.Equal(t, 1, stu.Gender_Id)
 
-// 	e = studentColl.Rel(SystemToken, 1, "Gender", []int{2})
-// 	assert.NoError(t, e)
-// 	result, e = studentColl.Get(SystemToken, 1, "")
-// 	assert.NoError(t, e)
-// 	stu = result.(*Student)
-// 	assert.Equal(t, 2, stu.Gender_Id)
+	e = studentColl.Rel(SystemToken, 1, "gender", []int{2})
+	assert.NoError(t, e)
+	result, e = studentColl.Get(SystemToken, 1, "")
+	assert.NoError(t, e)
+	stu = result.(*Student)
+	assert.Equal(t, 2, stu.Gender_Id)
 
-// 	//one 2 many change student supervisor_id from 1 to 2
-// 	e = supervisorColl.Rel(SystemToken, 2, "Students", []int{1})
-// 	assert.NoError(t, e)
-// 	result, e = studentColl.Get(SystemToken, 1, "")
-// 	assert.NoError(t, e)
-// 	stu = result.(*Student)
-// 	assert.Equal(t, 2, stu.Supervisor_Id)
+	//one 2 many change student supervisor_id from 1 to 2
+	e = supervisorColl.Rel(SystemToken, 2, "students", []int{1})
+	assert.NoError(t, e)
+	result, e = studentColl.Get(SystemToken, 1, "")
+	assert.NoError(t, e)
+	stu = result.(*Student)
+	assert.Equal(t, 2, stu.Supervisor_Id)
 
-// 	//many 2 many
-// 	e = studentColl.Rel(SystemToken, 1, "Classes", []int{3})
-// 	assert.NoError(t, e)
-// 	var arr []Student_Class
-// 	e = DBTest().DB.Select(&arr, "select * from student_class where student_id=1 and class_id=3")
-// 	assert.NoError(t, e)
-// 	assert.Equal(t, 1, len(arr))
+	//many 2 many
+	e = studentColl.Rel(SystemToken, 1, "classes", []int{3})
+	assert.NoError(t, e)
+	var arr []Student_Class
+	e = DBTest().DB.Select(&arr, "select * from student_class where student_id=1 and class_id=3")
+	assert.NoError(t, e)
+	assert.Equal(t, 1, len(arr))
 
-// }
+}
 
-// func Test_UnRel(t *testing.T) {
-// 	//many 2 one test
-// 	//delete student gender
-// 	result, e := studentColl.Get(SystemToken, 1, "")
-// 	assert.NoError(t, e)
-// 	stu := result.(*Student)
-// 	assert.Equal(t, 2, stu.Gender_Id)
+func Test_UnRel(t *testing.T) {
+	//many 2 one test
+	//delete student gender
+	result, e := studentColl.Get(SystemToken, 1, "")
+	assert.NoError(t, e)
+	stu := result.(*Student)
+	assert.Equal(t, 2, stu.Gender_Id)
 
-// 	e = studentColl.UnRel(SystemToken, 1, "Gender", 0)
-// 	assert.NoError(t, e)
-// 	result, e = studentColl.Get(SystemToken, 1, "")
-// 	assert.NoError(t, e)
-// 	stu = result.(*Student)
-// 	assert.Equal(t, 0, stu.Gender_Id)
+	e = studentColl.UnRel(SystemToken, 1, "gender", []int{0})
+	assert.NoError(t, e)
+	result, e = studentColl.Get(SystemToken, 1, "")
+	assert.NoError(t, e)
+	stu = result.(*Student)
+	assert.Equal(t, 0, stu.Gender_Id)
 
-// 	//one 2 many
-// 	e = supervisorColl.UnRel(SystemToken, 0, "Students", 1)
-// 	assert.NoError(t, e)
-// 	result, e = studentColl.Get(SystemToken, 1, "")
-// 	assert.NoError(t, e)
-// 	stu = result.(*Student)
-// 	assert.Equal(t, 0, stu.Supervisor_Id)
+	//one 2 many
+	e = supervisorColl.UnRel(SystemToken, 0, "students", []int{1})
+	assert.NoError(t, e)
+	result, e = studentColl.Get(SystemToken, 1, "")
+	assert.NoError(t, e)
+	stu = result.(*Student)
+	assert.Equal(t, 0, stu.Supervisor_Id)
 
-// 	//many 2 many
-// 	e = studentColl.UnRel(SystemToken, 1, "Classes", 1)
-// 	assert.NoError(t, e)
-// 	var arr []Student_Class
-// 	e = dbInstance.Select(&arr, "select * from student_class where student_id=1 and class_id=1")
-// 	assert.NoError(t, e)
-// 	assert.Equal(t, 0, len(arr))
-// }
+	//many 2 many
+	e = studentColl.UnRel(SystemToken, 1, "classes", []int{1})
+	assert.NoError(t, e)
+	var arr []Student_Class
+	e = DBTest().DB.Select(&arr, "select * from student_class where student_id=1 and class_id=1")
+	assert.NoError(t, e)
+	assert.Equal(t, 0, len(arr))
+}
 
 func Test_Delete(t *testing.T) {
 	e = studentColl.Delete(SystemToken, 1)
