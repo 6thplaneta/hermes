@@ -16,10 +16,10 @@ func HandleHttpError(c *gin.Context, err error, logger *Logger) {
 	if err == ErrNotFound {
 
 		statusCode = http.StatusNotFound
-	} else if err == ErrForbidden || err == ErrTokenInvalid {
+	} else if err == ErrForbidden || err == ErrTokenInvalid || err == ErrAgentNotActive {
 		statusCode = http.StatusForbidden
 	} else if err == ErrObjectInvalid || err == ErrPassRequired || err == ErrPassword ||
-		err == ErrPassFormat || err == ErrRateExceed || err == ErrAgentNotActive {
+		err == ErrPassFormat || err == ErrRateExceed {
 		statusCode = http.StatusBadRequest
 	} else if err == ErrDuplicate || strings.Contains(err.Error(), Messages["DuplicateIndex"]) {
 		statusCode = http.StatusConflict
