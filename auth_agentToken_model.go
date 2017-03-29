@@ -35,7 +35,6 @@ func (pt *AgentTokenCollection) GetToken(token string, typ string) (AgentToken, 
 		strQ += " and type='" + typ + "'"
 	}
 	err := pt.DataSrc.DB.Get(&result, strQ)
-
 	if err == ErrNoRows {
 		return AgentToken{}, ErrTokenInvalid
 	}
