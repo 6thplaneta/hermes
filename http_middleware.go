@@ -3,6 +3,7 @@ package hermes
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 )
 
 func CORSMiddleware() gin.HandlerFunc {
@@ -71,8 +72,20 @@ func RateLimitMiddleware(rl *RateLimiter) gin.HandlerFunc {
 	}
 }
 
-func LoggerMiddleware(logger *Logger) gin.HandlerFunc {
+func LoggerMiddleware(logger *Logger, excludes []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
+
+		for i := 0; i < len(excludes); i++ {
+			var str string
+			str = excludes[i]
+
+			strs := strings.Split(str, ":")
+			if c.Request.Method == strs[0] && strings.Contains(c.Request.URL.Path, strs[1]) {
+				c.Next()
+				return
+			}
+		}
+
 		logger.LogHttp(c)
 		c.Next()
 

@@ -1,6 +1,7 @@
 package hermes
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -33,6 +34,14 @@ func (agentCont *AgentController) ChangePassword(c *gin.Context) {
 	c.BindJSON(&p)
 	token := c.Request.Header.Get("Authorization")
 	_, err := AgentColl.UpdatePasswordByOld(token, id, p.Old_Password, p.New_Password)
+	if application.Logger.Level >= 6 {
+		secretP := p
+		secretP.New_Password = "******"
+		secretP.Old_Password = "******"
+		s, _ := json.Marshal(secretP)
+		application.Logger.LogHttpByBody(c, string(s))
+	}
+
 	if err != nil {
 		HandleHttpError(c, err, application.Logger)
 		return
@@ -59,6 +68,15 @@ func (agentCont *AgentController) ChangePasswordByToken(c *gin.Context) {
 	c.BindJSON(&p)
 
 	err := AgentColl.UpdatePasswordByToken(c.Param("token"), p.New_Password, c.Query("email"))
+
+	if application.Logger.Level >= 6 {
+		secretP := p
+		secretP.New_Password = "******"
+		secretP.Old_Password = "******"
+		s, _ := json.Marshal(secretP)
+		application.Logger.LogHttpByBody(c, string(s))
+	}
+
 	if err != nil {
 		HandleHttpError(c, err, application.Logger)
 		return
