@@ -121,6 +121,7 @@ func (src *DataSrc) InitCache(conf *viper.Viper) error {
 		}
 	} else if engine == "freecache" {
 		cachesize := conf.GetInt("Cache.FreeCache.Size") * 1024 * 1024
+
 		src.Cache.FreeCache = freecache.NewCache(cachesize)
 		src.Cache.Enabled = true
 	} else {

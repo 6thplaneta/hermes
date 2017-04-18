@@ -75,6 +75,7 @@ func cacheListFreeCache(client *CacheClient, coll Collectionist, token string, p
 	if err != nil {
 		return nil, err
 	}
+
 	keyExists := true
 	val, errRG := client.FreeCache.Get(key)
 
@@ -83,6 +84,7 @@ func cacheListFreeCache(client *CacheClient, coll Collectionist, token string, p
 	} else if errRG != nil {
 		return nil, errRG
 	}
+
 	instType := coll.GetInstanceType()
 	if keyExists {
 		slice := reflect.MakeSlice(reflect.SliceOf(instType), 0, 0)
@@ -106,7 +108,10 @@ func cacheListFreeCache(client *CacheClient, coll Collectionist, token string, p
 		}
 		frSetErr := client.FreeCache.Set(key, bin, coll.Conf().CacheExpire)
 		if frSetErr != nil {
-			return nil, frSetErr
+			if frSetErr != freecache.ErrLargeEntry {
+				return nil, frSetErr
+
+			}
 		}
 		return res, nil
 	}

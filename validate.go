@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func ValidateField(value interface{}, rule string) error {
+func ValidateField(field interface{}, rule string) error {
 	var validate *validator.Validate
 
 	config := validator.Config{
@@ -14,7 +14,7 @@ func ValidateField(value interface{}, rule string) error {
 		ValidationFuncs: validator.BakedInValidators,
 	}
 	validate = validator.New(config)
-	err := validate.Field(value, rule)
+	err := validate.Field(field, rule)
 
 	return err
 
@@ -38,6 +38,7 @@ func ValidateStruct(value interface{}) error {
 	for _, err := range errs {
 		switch err.Tag {
 		case "required":
+			//todo required
 			buff.WriteString(err.Field + " is " + err.Tag + "! ")
 		case "email":
 			buff.WriteString(err.Field + " should be as " + err.Tag + " format! ")

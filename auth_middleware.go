@@ -1,6 +1,7 @@
 package hermes
 
 import (
+	// "fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -8,7 +9,6 @@ import (
 
 func AuthMiddleware(escapes []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-
 		if authEnabled == false || strings.Contains(c.Request.Method, "OPTIONS") {
 			c.Next()
 			return

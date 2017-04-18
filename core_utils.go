@@ -288,7 +288,7 @@ func ReadHttpBody(response *http.Response) string {
 }
 
 func GetFbUser(accessToken string) (*jason.Object, error) {
-	response, err := http.Get("https://graph.facebook.com/me?access_token=" + accessToken + "&fields=id,email,name,gender,first_name,last_name")
+	response, err := http.Get("https://graph.facebook.com/me?access_token=" + accessToken + "&fields=id,email,name,gender,first_name,last_name,work,about,bio,education")
 
 	if err != nil {
 		return nil, err

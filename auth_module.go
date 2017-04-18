@@ -35,7 +35,7 @@ var application *App
 var permColl, roleColl, rolePermColl, RoleAgentColl Collectionist
 var AgentTokenColl *AgentTokenCollection
 
-var permCont, roleCont, rolePermCont, roleAgentCont, agentTokenCont *Controller
+var permCont, roleCont, rolePermCont, roleAgentCont, agentTokenCont, deviceCont *Controller
 
 func (um *authModule) Init(app *App) error {
 	um.Name = "Auth"
@@ -58,6 +58,7 @@ func (um *authModule) Init(app *App) error {
 
 	AgentColl.Conf().SetAuth("Create Agent", "Get Agent", "List Agent", "Update Agent", "Delete Agent", "Relate Agent")
 	AgentTokenColl.Conf().SetAuth("Create Agent Token", "Get Agent Token", "List Agent Token", "Update Agent Token", "Delete Agent Token", "Relate Agent Token")
+	DeviceColl.Conf().SetAuth("", "", "List Device", "", "", "")
 
 	setRoutes(app)
 	return nil
@@ -90,5 +91,11 @@ func setRoutes(app *App) {
 	AuthorizationModule.SetCrudRoutes(roleAgentCont)
 	AuthorizationModule.SetCrudRoutes(roleCont)
 	AuthorizationModule.SetCrudRoutes(agentTokenCont)
+
+	deviceCont = AuthorizationModule.NewController(DeviceColl, "/devices")
+	app.Router.GET(deviceCont.GetBase()+"/meta", deviceCont.Meta)
+	app.Router.GET(deviceCont.GetBase()+"/report", deviceCont.Report)
+
+	app.Router.GET(deviceCont.GetBase(), deviceCont.List)
 
 }

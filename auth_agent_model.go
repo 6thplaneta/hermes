@@ -145,6 +145,7 @@ func (col *AgentCollection) GetByLoginToken(token string) (Agent, error) {
 }
 
 func (col *AgentCollection) UpdatePasswordByToken(token string, newPassword string, identity string) error {
+	identity = strings.ToLower(identity)
 	passToken, err := AgentTokenColl.GetToken(token, "password")
 
 	if err != nil {
@@ -248,7 +249,9 @@ func (col *AgentCollection) GetByFId(identity string, fid string) (Agent, error)
 func (col *AgentCollection) GetByGId(identity string, gid string) (Agent, error) {
 
 	agent := Agent{}
-	err := col.DataSrc.DB.Get(&agent, fmt.Sprintf("select * from agents where lower(identity)= lower('%s') and gid= '%s' and is_deleted=false ", identity, gid))
+	q := fmt.Sprintf("select * from agents where lower(identity)= lower('%s') and gid= '%s' and is_deleted=false ", identity, gid)
+	err := col.DataSrc.DB.Get(&agent, q)
+
 	if err != nil {
 		if err == ErrNoRows {
 			return Agent{}, ErrNotFound
@@ -421,7 +424,6 @@ func (col *AgentCollection) RequestPasswordToken(identity string) (AgentToken, e
 
 func (col *AgentCollection) Login(agent Agent, url string) (AgentToken, error) {
 	validationError := ValidateStruct(agent)
-
 	if validationError != nil {
 		return AgentToken{}, validationError
 	}

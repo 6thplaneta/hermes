@@ -85,6 +85,7 @@ func (logger *Logger) Trace(message string) {
 }
 
 func (logger *Logger) LogHttpByBody(c *gin.Context, body string) {
+
 	txt := "HTTP Request, Method: " + c.Request.Method + " IP: " + c.ClientIP() + " Path:" + c.Request.RequestURI
 	if logger.Level >= 5 {
 		txt = txt + " Token: " + c.Request.Header.Get("Authorization")
@@ -102,10 +103,14 @@ func (logger *Logger) LogHttp(c *gin.Context) {
 		txt = txt + " Token: " + c.Request.Header.Get("Authorization")
 	}
 	if logger.Level >= 6 {
+
 		reqBody := c.Request.Body
+
 		body, _ := ioutil.ReadAll(reqBody)
+
 		rdr1 := ioutil.NopCloser(bytes.NewBuffer(body))
 		c.Request.Body = rdr1
+
 		if c.Request.RequestURI != "/upload" {
 			txt = txt + " Data: " + string(body)
 		}
