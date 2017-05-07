@@ -23,10 +23,7 @@ func GetRelation(col Collectionist, id int, rel string) (interface{}, error) {
 
 	//kind of feild
 	kind := rval.FieldByName(strField).Kind()
-	// if !ok {
-	// 	return nil, errors.New("No such a field for get relation: " + strField)
-	// }
-	// kind := fl.Kind()
+
 	fieldType, err := GetFieldType(col.GetInstance(), strField)
 	if err != nil {
 		return nil, err
@@ -96,7 +93,6 @@ func GetOwnerAgent(col Collectionist, id int) (*Agent, error) {
 		return nil, err
 	}
 	objtype := reflect.TypeOf(obj)
-	// fmt.Println("owner type is ", objtype, reflect.TypeOf(Agent{}), objtype == reflect.TypeOf(Agent{}))
 	if objtype == reflect.TypeOf(Agent{}) {
 		ag := obj.(Agent)
 		return &ag, nil

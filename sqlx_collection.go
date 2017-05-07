@@ -203,7 +203,7 @@ func AddTable(db *sqlx.DB, instance interface{}) error {
 }
 
 /*
-* This is a function that connects to database and checks existance of column in table
+* connects to database and checks existance of column in table
 * @param 	*sql.Db		database
 * @param 	interface{} 	struct
 * @param	string 			field to search
@@ -227,7 +227,7 @@ func CheckPostgresColumn(db *sqlx.DB, table interface{}, field string) (bool, er
 }
 
 /*
-* This is a function that connects to database and adds a column in table
+* connects to database and adds a column in table
 * @param 	*sql.DB		database
 * @param 	interface{} 	struct
 * @param	string 			field to add
@@ -267,7 +267,7 @@ func AddPostgresColumn(db *sqlx.DB, table interface{}, field, dbtype string) err
 }
 
 /*
-* This is a function that connects to database and drops a column in table
+* connects to database and drops a column in table
 * @param 	*sqlx.DB			database
 * @param 	interface{} 	struct
 * @param	string 			field to remove
@@ -287,7 +287,7 @@ func DropPostgresColumn(db *sqlx.DB, table interface{}, field string) error {
 }
 
 /*
-* This is a function that connects to database, adds columns that exists in struct but does not exist in database
+* connects to database, adds columns that exists in struct but does not exist in database
 * and also removes columns removed from struct
 * @param 	*sqlx.DB			database
 * @param 	interface{} 	struct
@@ -391,7 +391,7 @@ func AddIndexs(db *sqlx.DB, table interface{}) error {
 }
 
 /*
-* This is a function that connects to database and adds index on field
+* connects to database and adds index on field
 * @param 	*sqlx.DB		database
 * @param 	interface{} 	struct
 * @param 	string 			colum name
@@ -412,7 +412,7 @@ func AddPostgresIndex(db *sqlx.DB, table interface{}, field string) error {
 }
 
 /*
-* This is a function that connects to database and adds index on field
+* connects to database and adds index on field
 * @param 	*sqlx.DB		database
 * @param 	interface{} 	struct
 * @param 	string 			colum name
@@ -446,7 +446,7 @@ func AddPostgresUIndex(db *sqlx.DB, table interface{}, field string) error {
 }
 
 /*
-* This is a function that connects to database and adds a foreign key to table
+* connects to database and adds a foreign key to table
 * @param 	*sqlx.DB		database
 * @param 	interface{} 	struct
 * @param 	string 			foreign key name in table
@@ -481,7 +481,7 @@ func AddPostgresForeignKey(db *sqlx.DB, local interface{}, localFeild string, fo
 }
 
 /*
-* This is a function that connects to database and gets list of ollection
+* connects to database and gets list of ollection
 * @param 	string			token for authorization
 * @param 	*sqlx.DB		database
 * @param 	interface{} 	this is a new instance of the collection struct(Person{},User{})
@@ -544,7 +544,6 @@ func GetCollection(token string, datasrc *DataSrc, instance interface{}, params 
 
 		err = PopulateCollection(SystemToken, db, ress, instance, populate)
 	}
-
 	return ress, err
 }
 

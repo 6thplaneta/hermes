@@ -32,5 +32,6 @@ func InitMessages() {
 	Messages["ManyItems"] = "Too many items!"
 	Messages["JsonFormatError"] = "Incorrect Json Format!"
 	Messages["DbNotFoundError"] = "sql: no rows in result set"
+	Messages["NotFoundConfig"] = "Could not configure app!"
 
 }

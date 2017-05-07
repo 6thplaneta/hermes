@@ -11,14 +11,11 @@ import (
 func GenerateSearchSQL(searchInstance *SearchClient, instance interface{}, search, baseTable string) (string, error) {
 	sqlQuery := ""
 	tp := GetTypeName(instance)
-	// fmt.Println("Type Name in search ", tp)
 	q := elastic.NewQueryStringQuery(search)
 	searchResult, err := searchInstance.Elastic.Search().
 		Index(searchInstance.IndexName).
 		Query(q).
 		Type(tp).
-		// Sort("user", true).
-		// From(0).Size(10).
 		Do()
 	if err != nil {
 		return "", err

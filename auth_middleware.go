@@ -9,11 +9,12 @@ import (
 
 func AuthMiddleware(escapes []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		//don't check authentication if auth is disabled
 		if authEnabled == false || strings.Contains(c.Request.Method, "OPTIONS") {
 			c.Next()
 			return
 		}
-
+		//don't check auth for the apis do not require authentication
 		for i := 0; i < len(escapes); i++ {
 			var str string
 			str = escapes[i]

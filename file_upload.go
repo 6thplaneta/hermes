@@ -15,7 +15,7 @@ import (
 /**
 * File Uploader
 *
-* This is a function that handle file uploading process
+* handle file uploading process
 * @param 	gin.Context		a gin Context input
 * @param 	string 			name of file input field , like image , avatar , file and etc...
 * @return	string 			file uploaded path on success

@@ -189,9 +189,11 @@ func NewCollection(instance interface{}, datasrc *DataSrc) (*Collection, error) 
 	col := &Collection{}
 	col.Instance = instance
 	col.DataSrc = datasrc
+	//get the name of db table from dbspace tag
 	dbspace, _ := GetTagValue(col.Instance, "Id", "hermes", "dbspace")
 
 	if dbspace == "" {
+		//dbspace tag is required for all collections
 		return col, NewError("NotValid", "No db Space defined in Id field!")
 	}
 
@@ -207,7 +209,7 @@ func NewCollection(instance interface{}, datasrc *DataSrc) (*Collection, error) 
 	// add collection to map
 	CollectionsMap[typ] = col
 
-	// add struct map for midtable
+	// add midtable to struct map
 	_, midtable := GetTagValue(col.Instance, "Id", "hermes", "midtable")
 	if midtable {
 		AddStructMap(typ.Name(), instance)
@@ -220,10 +222,13 @@ func NewCollection(instance interface{}, datasrc *DataSrc) (*Collection, error) 
 func NewDBCollection(instance interface{}, datasrc *DataSrc) (*Collection, error) {
 	var err error
 	dbInstance := datasrc.DB
+	//add related table to database
 	err = AddTable(dbInstance, instance)
 	if err != nil {
 		return nil, err
 	}
+	//SyncSchema - Sync struct and dbtable if the struct has changed
+	// delete removed fields and add new fields
 	err = SyncSchema(dbInstance, instance)
 	if err != nil {
 		return nil, err

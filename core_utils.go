@@ -20,7 +20,7 @@ func TrimSuffix(s, suffix string) string {
 }
 
 /*
-* This is a function that searches a string value in array
+* searches a string value in array
 * @param 	string			string value to search in array
 * @param 	[]string 		array
 * @return	bool 			determines if value exists or not.
@@ -72,7 +72,7 @@ func IsNil(value interface{}) (bool, error) {
 }
 
 /*
-* This is a function that casts an interface value to string
+* casts an interface value to string
 * @param 	interface{}		value
 * @param 	string 			type of field
 * @return	string 			string value
@@ -118,7 +118,7 @@ func CastToStr(vl interface{}, typ, dbtype string) string {
 }
 
 /*
-* This is a function that casts an array to string(splict with , )
+* casts an array to string(splict with , )
 * @param 	interface{}		array to cast
 * @param 	string 			type of array
 * @return	string 			casted value (example 'hi','salam')
@@ -182,7 +182,7 @@ func CastArrToStr(vl interface{}, typ, dbtype string) string {
 }
 
 /*
-* This is a function that casts a string value to specified type
+* casts a string value to specified type
 * @param 	string			string for cast to interface{}
 * @param 	string 			type of value
 * @return	interface{} 	casted value
@@ -221,7 +221,7 @@ func CastStrToVal(strValue, typ string) interface{} {
 }
 
 /*
-* This is a function that casts a string value to array
+* casts a string value to array
 * @param 	string			string for cast to array (split with ,)
 * @param 	string 			type of array
 * @return	interface{} 	array of values
@@ -315,12 +315,4 @@ func RandStringRunes(n int) string {
 		b[i] = letterRunes[rand.Intn(len(letterRunes))]
 	}
 	return string(b)
-}
-
-func DeallocateStatements() {
-	for {
-
-		time.Sleep(time.Second)
-		application.DataSrc.DB.Exec("deallocate all;")
-	}
 }

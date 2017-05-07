@@ -6,7 +6,7 @@ import (
 )
 
 /*
-* This is a function that sends email to the specified email address
+* sends email to the specified email address
 * @param 	string		subject
 * @param 	string 		body
 * @param 	string		to adress

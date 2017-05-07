@@ -1,32 +1,37 @@
 package hermes
 
 import (
-	// "fmt"
 	"reflect"
 	"strings"
 )
 
-func GetFieldJson(col Collectionist, json string) string {
-	return CollectionsJsonMap[col.GetInstanceType()][json]
+//searches in CollectionsJsonMap for the json title of a field
+//GetFieldJson by collection
+func GetFieldJson(col Collectionist, field string) string {
+	return CollectionsJsonMap[col.GetInstanceType()][field]
 
 }
 
-func GetFieldJsonByInst(instance interface{}, json string) string {
+//searches in CollectionsJsonMap for the json title of a field
+//GetFieldJson by struct
+func GetFieldJsonByInst(instance interface{}, field string) string {
 	tp := reflect.TypeOf(instance)
 	if tp.Kind() == reflect.Ptr {
 		tp = tp.Elem()
 	}
-	// fmt.Println("field***********", CollectionsJsonMap[tp])
 
-	return CollectionsJsonMap[tp][json]
+	return CollectionsJsonMap[tp][field]
 }
 
-func GetFieldJsonIndirectByInst(instance interface{}, json string) string {
+//searches in CollectionsJsonMap for the json title of a nested fields
+//example instance=Agent_Token feild= Agent.Is_Active returns is_active
+//GetFieldJson by struct
+func GetFieldJsonIndirectByInst(instance interface{}, field string) string {
 	tp := reflect.TypeOf(instance)
 	if tp.Kind() == reflect.Ptr {
 		tp = tp.Elem()
 	}
-	kkl := strings.Split(json, ".")
+	kkl := strings.Split(field, ".")
 	key := CollectionsJsonMap[tp][kkl[0]]
 	if len(kkl) > 1 {
 		njson := strings.Join(kkl[1:], ".")

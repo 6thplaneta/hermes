@@ -41,15 +41,20 @@ type DataSrc struct {
 	Search *SearchClient
 }
 
+//init datasources if related configs exist
 func (src *DataSrc) Init(conf *viper.Viper) error {
+	//initial DataSrc.DB from the confing passed to it
 	errDB := src.InitDB(conf)
 	if errDB != nil {
 		return errDB
 	}
+	//initial DataSrc.Cache from the confing passed to it
+
 	errCache := src.InitCache(conf)
 	if errCache != nil {
 		return errCache
 	}
+	//initial DataSrc.Search from the confing passed to it
 	errSearch := src.InitSearch(conf)
 	if errSearch != nil {
 		return errSearch
@@ -57,6 +62,7 @@ func (src *DataSrc) Init(conf *viper.Viper) error {
 	return nil
 }
 
+//hermes supports postgres,sqlite and mysql
 func (src *DataSrc) InitDB(conf *viper.Viper) error {
 	dbEngine := conf.GetString("DB.Engine")
 	dbHost := conf.GetString("DB.Host")

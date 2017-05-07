@@ -1,32 +1,20 @@
 package hermes
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	"github.com/satori/go.uuid"
 	"github.com/spf13/viper"
-	"math/rand"
 	"net/http"
 	"os"
 	"os/signal"
-	"time"
 )
 
 var SystemToken string
 
-const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-func randStringBytes(n int) string {
-	b := make([]byte, n)
-	for i := range b {
-		b[i] = letterBytes[rand.Intn(len(letterBytes))]
-	}
-	return string(b)
-}
-
 func init() {
-	rand.Seed(time.Now().UnixNano())
-	SystemToken = randStringBytes(25)
+	//with systemtoken, the user would have access to all actions in system
+	SystemToken = uuid.NewV4().String()
 	InitMessages()
 }
 
@@ -39,22 +27,20 @@ type App struct {
 }
 
 func (app *App) config(path string) {
+	//read the config of application
 	app.Conf.SetConfigFile(path)
 
-	// app.Conf.SetConfigName("conf")
-	// app.Conf.AddConfigPath(".")
-	// app.Conf.SetConfigType("yml")
 	err := app.Conf.ReadInConfig()
+	//confing file is necessary
 	if err != nil {
-		panic("could not configure app")
+		panic(Messages["NotFoundConfig"])
 	}
-	// app.Conf.Debug()
-
 }
 
 func NewApp(configPath string) *App {
 	app := &App{}
 	app.Router = gin.Default()
+	//set app config
 	app.Conf = viper.New()
 	app.config(configPath)
 	app.Modules = make([]Moduler, 0)
@@ -106,6 +92,7 @@ func (app *App) killTraper() {
 	os.Exit(0)
 }
 
+//
 func (app *App) GetSettings(name string) Settings {
 	settings := app.Conf.GetStringMap(name)
 	if settings == nil {
@@ -120,12 +107,12 @@ func (app *App) GetSettings(name string) Settings {
 
 }
 
+//add a new module to app modules
 func (app *App) Mount(mg Moduler, mountbase string) {
 	app.Modules = append(app.Modules, mg)
 	mg.SetMountPath(mountbase)
 	mg.SetApp(app)
 	mg.SetDataSrc(app.DataSrc)
-	fmt.Println("mg ", mg)
 	err := mg.Init(app)
 	if err != nil {
 		panic("mount error at: " + mountbase + " error message is: " + err.Error())
@@ -135,10 +122,11 @@ func (app *App) Mount(mg Moduler, mountbase string) {
 }
 
 func (app *App) Run() {
-	go DeallocateStatements()
 
 	binding := app.Conf.GetString("App.Bind-Address")
 	app.Router.Use(CORSMiddleware())
 
 	app.Router.Run(binding)
+	// http.ListenAndServe(binding, app.Router)
+
 }

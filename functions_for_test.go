@@ -226,7 +226,6 @@ func TestMain(m *testing.M) {
 	// person := Person{}
 	// FillJsonMap(person)
 
-	// go DBTestDeallocate()
 	//start
 	application = NewApp("conf.yml")
 	application.InitLogs("")

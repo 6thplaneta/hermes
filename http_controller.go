@@ -296,7 +296,7 @@ func (cont *Controller) SetBase(base string) {
 }
 
 /*
-* This is a function that receives query string values and create params object for filter
+* receives query string values and create params object for filter
 * @param 	interface{}		instance of struct that needs filter
 * @param 	url.Values 		query parameters
 * @return	Params 			param object

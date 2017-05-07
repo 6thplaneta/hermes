@@ -36,6 +36,7 @@ func AddRole(role string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	//Add new role if not exists.Otherwise, return the existing role.
 	if len(rlid) == 0 {
 		rl := &Role{Title: role}
 		rlmatr, errcr := roleColl.Create(SystemToken, nil, rl)
@@ -58,13 +59,16 @@ func AddRolePermission(roleid int, perms ...string) error {
 		prmlist += "'" + prm + "',"
 	}
 	prmlist = prmlist[:len(prmlist)-1]
-	errselect := roleColl.GetDataSrc().DB.Select(&ids, "select id from permissions where title in ("+prmlist+");")
+	//get id of permissions
+	errselect := application.DataSrc.DB.Select(&ids, "select id from permissions where title in ("+prmlist+");")
 	if errselect != nil {
 		return errselect
 	}
+	//check existance of the roles_permissions by role and permission ids
+	//if the role_permission not exists add it to db
 	for _, id := range ids {
 		dbid := 0
-		err := roleColl.GetDataSrc().DB.Get(&dbid, fmt.Sprintf("select id from roles_permissions where role_id=%d and permission_id=%d ", roleid, id))
+		err := application.DataSrc.DB.Get(&dbid, fmt.Sprintf("select id from roles_permissions where role_id=%d and permission_id=%d ", roleid, id))
 		if err == sql.ErrNoRows {
 			rl_prm := &Role_Permission{Role_Id: roleid, Permission_Id: id}
 			_, errCr := rolePermColl.Create(SystemToken, nil, rl_prm)

@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+//checks validation rules on a field
 func ValidateField(field interface{}, rule string) error {
 	var validate *validator.Validate
 
@@ -19,6 +20,8 @@ func ValidateField(field interface{}, rule string) error {
 	return err
 
 }
+
+//checks validation rules on all fields of an object
 func ValidateStruct(value interface{}) error {
 
 	var validate *validator.Validate
@@ -37,8 +40,9 @@ func ValidateStruct(value interface{}) error {
 	buff := bytes.NewBufferString("")
 	for _, err := range errs {
 		switch err.Tag {
+		//return appropriate messages
 		case "required":
-			//todo required
+			//err.Feild is name of field
 			buff.WriteString(err.Field + " is " + err.Tag + "! ")
 		case "email":
 			buff.WriteString(err.Field + " should be as " + err.Tag + " format! ")
@@ -48,6 +52,7 @@ func ValidateStruct(value interface{}) error {
 		}
 	}
 
+	// concat all errors in one error object and return it
 	erN := ErrObjectInvalid
 	erN.Decsription = strings.TrimSpace(buff.String())
 

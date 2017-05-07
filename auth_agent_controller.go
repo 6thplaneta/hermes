@@ -34,6 +34,7 @@ func (agentCont *AgentController) ChangePassword(c *gin.Context) {
 	c.BindJSON(&p)
 	token := c.Request.Header.Get("Authorization")
 	_, err := AgentColl.UpdatePasswordByOld(token, id, p.Old_Password, p.New_Password)
+	//if system logs data of this http request, hide passwords in log files
 	if application.Logger.Level >= 6 {
 		secretP := p
 		secretP.New_Password = "******"
@@ -53,6 +54,7 @@ func (agentCont *AgentController) ChangePassword(c *gin.Context) {
 
 func (agentCont *AgentController) RequestPasswordToken(c *gin.Context) {
 
+	//
 	_, err := AgentColl.RequestPasswordToken(c.Param("identity"))
 	if err != nil {
 		HandleHttpError(c, err, application.Logger)
@@ -68,6 +70,7 @@ func (agentCont *AgentController) ChangePasswordByToken(c *gin.Context) {
 	c.BindJSON(&p)
 
 	err := AgentColl.UpdatePasswordByToken(c.Param("token"), p.New_Password, c.Query("email"))
+	//if system logs data of this http request, hide passwords in log files
 
 	if application.Logger.Level >= 6 {
 		secretP := p
@@ -88,6 +91,7 @@ func (agentCont *AgentController) ChangePasswordByToken(c *gin.Context) {
 
 func (agentCont *AgentController) ActiveUserByToken(c *gin.Context) {
 
+	//pass the activation token , if it is valid activate the user
 	err := AgentColl.ActiveUserByToken(c.Param("token"))
 	if err != nil {
 		HandleHttpError(c, err, application.Logger)

@@ -74,7 +74,7 @@ func GetFieldsByTag(val interface{}, tag, key string) []string {
 }
 
 /*
-* This is a function that returns if the feild exists or not and field type
+* returns if the feild exists or not and field type
 * It iterates in inner objects to get type of inner feilds (example User.Email for Person Struct)
 * @param 	interface{}		instance of struct
 * @param 	string 			name of field
@@ -150,7 +150,7 @@ func ConcatArrayToString(instance interface{}, feild, spliter string) string {
 }
 
 /*
-* This is a function that returns field type
+* returns field type
 * It iterates in inner objects to get type of inner feilds (example User.Email for Person Struct)
 * @param 	interface{}		instance of struct
 * @param 	string 			name of field
@@ -179,7 +179,7 @@ func GetFieldType(instance interface{}, name string) (reflect.Type, error) {
 }
 
 /*
-* This is a function that returns tag value of a field
+* returns tag value of a field
 * @param 	reflect.StructField		instance of struct
 * @param 	string 			tag name
 * @param 	string 			key
@@ -196,7 +196,7 @@ func GetTagValueByFeild(field reflect.StructField, tag, key string) (string, boo
 }
 
 /*
-* This is a function that returns tag value of the entered field
+* returns tag value of the entered field
 * @param 	interface{}		instance of struct
 * @param 	string 			field name to get tag value
 * @param 	string 			tag name
@@ -224,7 +224,7 @@ func GetTagValueByType(typ reflect.Type, field, tag, key string) (string, bool) 
 }
 
 /*
-* This is a function that searches a value in array of struct objects
+* searches a value in array of struct objects
 * @param 	reflect.Value	reflect value of array object
 * @param 	string 			It searches value in this field
 * @param 	string 			value to search

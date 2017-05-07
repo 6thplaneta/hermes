@@ -11,12 +11,14 @@ import (
 type AgentToken struct {
 	Id            int       `json:"id" hermes:"dbspace:agent_tokens,ui-html:None"`
 	Agent_Id      int       `json:"agent_id" validate:"required"`
+	Agent         Agent     `db:"-" json:"agent,omitempty" validate:"structonly"`
 	Token         string    `json:"token" validate:"required"`
 	Creation_Date time.Time `json:"creation_date" validate:"required" hermes:"type:time"`
-	Type          string    `json:"type" validate:"required"`
-	Is_Expired    bool      `json:"is_expired" hermes:"editable"`
-	Device_Id     int       `json:"device_id" validate:"required"`
-	Device        Device    `db:"-" json:"device" validate:"structonly" hermes:"many2one"`
+	//token types can be password,login, or activation
+	Type       string `json:"type" validate:"required"`
+	Is_Expired bool   `json:"is_expired" hermes:"editable"`
+	Device_Id  int    `json:"device_id" validate:"required"`
+	Device     Device `db:"-" json:"device" validate:"structonly" hermes:"many2one"`
 }
 
 type AgentTokenCollection struct {
@@ -28,6 +30,7 @@ func NewAgentTokenCollection(instance interface{}, dsrc *DataSrc) (*AgentTokenCo
 	return &AgentTokenCollection{tmpc}, err
 }
 
+//get from agent_tokens by token and type
 func (pt *AgentTokenCollection) GetToken(token string, typ string) (AgentToken, error) {
 	result := AgentToken{}
 	strQ := fmt.Sprintf("select * from agent_tokens where is_expired=false and token= '%s' ", token)
@@ -46,8 +49,10 @@ func (pt *AgentTokenCollection) GetToken(token string, typ string) (AgentToken, 
 
 }
 
+//check if the token exists in db
 func (pt *AgentTokenCollection) Exists(token string) (bool, error) {
 	result := AgentToken{}
+	//search in active tokens
 	err := pt.DataSrc.DB.Get(&result, fmt.Sprintf("select * from agent_tokens where is_expired=false and token= '%s' ", token))
 
 	if err != nil && err.Error() != Messages["DbNotFoundError"] {
@@ -63,6 +68,7 @@ func (pt *AgentTokenCollection) Exists(token string) (bool, error) {
 }
 
 func (pt *AgentTokenCollection) Logout(token string) error {
+	//make the token expired to logout from system
 	_, err := pt.DataSrc.DB.Exec(fmt.Sprintf("update agent_tokens set is_expired = true where token= '%s' ", token))
 	if err != nil && err.Error() != Messages["DbNotFoundError"] {
 		return err
@@ -89,9 +95,11 @@ func NewToken(agentid int, tokenType string) AgentToken {
 	agentToken.Creation_Date = time.Now()
 	agentToken.Type = tokenType
 
+	//password and activation tokens are 5-digit numbers
 	if tokenType == "password" || tokenType == "activation" {
 		agentToken.Token = random(10000, 99999)
 	} else {
+		//login token is a uuid string
 		u1 := uuid.NewV4()
 		agentToken.Token = u1.String()
 	}

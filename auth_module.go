@@ -13,6 +13,7 @@ type authModule struct {
 
 var permissions = []string{"Create Agent", "Get Agent", "Edit Agent|$own", "Delete Agent", "Update Agent", "Add Permission", "Edit Role", "Add Role", "Delete Role"}
 
+//define hermes collections
 func createCollections(app *App) error {
 	var collErr error
 
@@ -41,6 +42,7 @@ func (um *authModule) Init(app *App) error {
 	um.Name = "Auth"
 	application = app
 	settings := app.GetSettings("Agents")
+	//secret key is necessary for encrypting passwords
 	if settings["Secret"] == nil {
 		return errors.New("secret config does not exists")
 	}
@@ -54,6 +56,7 @@ func (um *authModule) Init(app *App) error {
 		return errors.New(errmsg)
 	}
 
+	//insert permissions in db if not exists
 	RegisterPermissions(permissions)
 
 	AgentColl.Conf().SetAuth("Create Agent", "Get Agent", "List Agent", "Update Agent", "Delete Agent", "Relate Agent")
@@ -71,13 +74,12 @@ func setRoutes(app *App) {
 	rolePermCont = AuthorizationModule.NewController(rolePermColl, "/roles_permissions")
 	roleAgentCont = AuthorizationModule.NewController(RoleAgentColl, "/roles_agents")
 	agentCont = NewAgentController(AgentColl, "/agents")
-	// agentTokenCont = NewController(agentTokenColl, mountBase+"/permissions")
 	agentTokenCont = AuthorizationModule.NewController(AgentTokenColl, "/agent_tokens")
 
-	// app.Router.POST(permCont.GetBase(), permCont.Create)
 	app.Router.GET(permCont.GetBase(), permCont.List)
 	app.Router.GET(permCont.GetBase()+"/meta", permCont.Meta)
 
+	//auth apis
 	AuthorizationModule.SetCrudRoutes(agentCont)
 	AuthorizationModule.POST("/login", agentCont.Login)
 	AuthorizationModule.POST("/flogin/:ftoken", agentCont.FBLogin)
