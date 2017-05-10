@@ -23,19 +23,19 @@ import (
 * @author	Mostafa Solati <Mostafa.solati@gmail.com>
  */
 func Upload(c *gin.Context, inputName, savePath string) (string, error) {
+	//generate unique filename
 	uniquefid := uuid.NewV4().String()
 	r := c.Request
 	r.ParseMultipartForm(32 << 20)
+	//get file content
 	file, handler, err := r.FormFile(inputName)
 	if err != nil {
 		return "", err
 	}
 	defer file.Close()
+	//categorize folders by content-type
 	contentType := handler.Header.Get("Content-Type") + "/"
 
-	// if handler.Header.Get("Content-Type") != "image/jpeg" {
-	// 	return "", errors.New("Image should be jpeg!")
-	// }
 	year, month, _ := time.Now().Date()
 	var path_ string = "./upload/"
 	if savePath != "" {
@@ -43,16 +43,23 @@ func Upload(c *gin.Context, inputName, savePath string) (string, error) {
 	}
 	parts := strings.Split(contentType, "/")
 	path_ += parts[0] + "/"
+	//categorize folders by year and then month
+
 	path_ += strconv.Itoa(year) + "/" + strconv.Itoa(int(month)) + "/"
 	err = os.MkdirAll(path_, 0777)
 	if err != nil {
 		return "", err
 	}
+	//create new file with
+
 	f, err := os.OpenFile(path_+uniquefid+path.Ext(handler.Filename), os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		return "", err
 	}
 	defer f.Close()
+	//create content of upload file to the new file with
+
 	io.Copy(f, file)
+	//return name of file
 	return path_ + uniquefid + path.Ext(handler.Filename), nil
 }

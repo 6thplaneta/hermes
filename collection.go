@@ -188,6 +188,7 @@ func FillJsonMap(instance interface{}) {
 func NewCollection(instance interface{}, datasrc *DataSrc) (*Collection, error) {
 	col := &Collection{}
 	col.Instance = instance
+	//set collection DataSource
 	col.DataSrc = datasrc
 	//get the name of db table from dbspace tag
 	dbspace, _ := GetTagValue(col.Instance, "Id", "hermes", "dbspace")
@@ -285,6 +286,7 @@ func (col *Collection) Create(token string, trans *sql.Tx, obj interface{}) (int
 	if validationError != nil {
 		return obj, validationError
 	}
+	//check for existing one2one nested objects to create before creation of the main object
 	err = PreUnPopulate(token, trans, obj)
 	if err != nil {
 		return obj, err
@@ -309,12 +311,15 @@ func (col *Collection) Create(token string, trans *sql.Tx, obj interface{}) (int
 	if rval.Kind() == reflect.Ptr {
 		rval = rval.Elem()
 	}
+	//set id of inserted object
 	rval.FieldByName("Id").SetInt(id)
 
+	//check for one2many and many2many relations and create the related objects
 	err = UnPopulate(token, trans, obj)
 	if err != nil {
 		return obj, err
 	}
+	//insert object in elastic search if seaarch engine is elastic
 	col.IndexDocument(obj)
 
 	return obj, nil
@@ -322,6 +327,8 @@ func (col *Collection) Create(token string, trans *sql.Tx, obj interface{}) (int
 
 func (col *Collection) IndexDocument(obj interface{}) {
 	s := col.DataSrc.Search
+	//if search engine is elastic search,add to elasticsearch
+
 	if s.Engine == "elastic" {
 		s.ToIndex <- obj
 	}
@@ -344,35 +351,29 @@ func (col *Collection) Update(token string, id int, obj interface{}) error {
 	if validationError != nil {
 		return validationError
 	}
-
-	//property fields
-	editables := GetFieldsByTag(obj, "hermes", "editable")
-	if len(editables) == 0 {
-		return nil
-	}
-	_, err := col.DataSrc.DB.Exec(getUpdateQuery(editables, obj, id))
+	strq, err := getUpdateQuery(obj, id)
 	if err != nil {
 		return err
 	}
-	// count, _ := result.RowsAffected()
-	// fmt.Println("******************count********** ", count)
+	_, err = col.DataSrc.DB.Exec(strq)
+	if err != nil {
+		return err
+	}
 
-	// if count == 0 {
-	// 	return ErrNotFound
-	// }
 	return nil
 }
 
 // getCollectionn
-
 func (col *Collection) List(token string, params *Params, pg *Paging, populate, project string) (interface{}, error) {
 	cnf := col.Conf()
+	//check read access
 	if !Authorize(token, cnf.Authorizations.List, 0, "LIST", cnf.CheckAccess) {
 
 		return nil, ErrForbidden
 	}
 
 	var projectArray []string
+	//field which is selected in select query. if project is empty, all field will be return from db
 	if project != "" {
 		projectArray = strings.Split(project, ",")
 	}
@@ -389,12 +390,12 @@ func (col *Collection) Get(token string, id int, populate string) (interface{}, 
 	}
 	inst := reflect.New(col.Typ)
 	res := inst.Interface()
-	// err := col.DataSrc.DB.C(col.Dbspace).Find(bson.M{"_id": bson.ObjectIdHex(id)}).Select(nil).One(res)
 
 	err := col.DataSrc.DB.Get(res, fmt.Sprintf("select * from %s where Id= %d ", col.Dbspace, id))
 	if err != nil && err.Error() == Messages["DbNotFoundError"] {
 		return res, ErrNotFound
 	}
+	//get nested objects(one2one,one2many,many2many)
 	if populate != "" {
 		err = PopulateStruct(SystemToken, col.DataSrc.DB, res, populate)
 	}

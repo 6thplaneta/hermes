@@ -45,15 +45,20 @@ func ChangeGoTypeToPostgres(typeOfField, dbtype string) string {
 	return typ
 }
 
-func getUpdateQuery(columns []string, obj interface{}, id int) string {
+func getUpdateQuery(obj interface{}, id int) (string, error) {
+	editables := GetFieldsByTag(obj, "hermes", "editable")
+	if len(editables) == 0 {
+		return "", errors.New("No editable field!")
+	}
+
 	rval := reflect.ValueOf(obj)
 	if rval.Kind() == reflect.Ptr {
 		rval = rval.Elem()
 	}
 	var strQ, strTypes, strVals, strKeys, updateQuery string
 	counter := 1
-	for i := 0; i < len(columns); i++ {
-		typeField, _ := rval.Type().FieldByName(columns[i])
+	for i := 0; i < len(editables); i++ {
+		typeField, _ := rval.Type().FieldByName(editables[i])
 		dbtag := typeField.Tag.Get("db")
 
 		if dbtag != "-" {
@@ -67,8 +72,7 @@ func getUpdateQuery(columns []string, obj interface{}, id int) string {
 			}
 
 			strKeys = strKeys + typeField.Name + ","
-			// fmt.Println("column , field is ", columns[i], GetFieldJsonByInst(obj, columns[i]))
-			val := prepareValue(rval.FieldByName(columns[i]).Interface(), typeOfField, dbtype)
+			val := prepareValue(rval.FieldByName(editables[i]).Interface(), typeOfField, dbtype)
 			strVals = strVals + val + ","
 			strTypes = strTypes + ChangeGoTypeToPostgres(typeOfField, dbtype) + ","
 
@@ -84,7 +88,7 @@ func getUpdateQuery(columns []string, obj interface{}, id int) string {
 	strQ += " EXECUTE " + rndStatement + "(" + strVals + strconv.Itoa(id) + ");"
 	// fmt.Println("update query is...", strQ)
 	strQ += ` DEALLOCATE all;`
-	return strQ
+	return strQ, nil
 }
 
 func getInsertQuery(obj interface{}) string {
