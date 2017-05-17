@@ -14,7 +14,7 @@ import (
 * @return	bool 			determines if feild exists or not.
 * @return	string 			type of feild
  */
-func SendEmail(subject, body, address string, sender map[string]interface{}) error {
+func SendEmail(subject, body, address string, sender map[string]interface{}, html bool) error {
 	var senderEmail, senderPassword, host, port string
 	if sender == nil {
 		return errors.New("missing sender information")
@@ -47,8 +47,14 @@ func SendEmail(subject, body, address string, sender map[string]interface{}) err
 
 	// Connect to the server, authenticate, set the sender and reciepent,
 	// and send the email all in one step.
+	mime := ""
+	if html {
+		mime = "MIME-Version: 1.0" + "\r\n" +
+			"Content-type: text/html" + "\r\n"
+	}
 	to := []string{address}
 	msg := []byte("To: " + address + "\r\n" +
+		mime +
 		"Subject: " + subject + "\r\n" +
 		"\r\n" +
 		body + "\r\n")
