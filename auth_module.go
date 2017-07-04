@@ -41,12 +41,12 @@ var permCont, roleCont, rolePermCont, roleAgentCont, agentTokenCont, deviceCont 
 func (um *authModule) Init(app *App) error {
 	um.Name = "Auth"
 	application = app
-	settings := app.GetSettings("Agents")
+	settings := app.GetSettings("agents")
 	//secret key is necessary for encrypting passwords
-	if settings["Secret"] == nil {
+	if settings["secret"] == nil {
 		return errors.New("secret config does not exists")
 	}
-	secretKey = settings["Secret"].(string)
+	secretKey = settings["secret"].(string)
 
 	permCache = make(map[string][]string, PermissionCacheLength)
 

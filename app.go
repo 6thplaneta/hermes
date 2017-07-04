@@ -1,6 +1,7 @@
 package hermes
 
 import (
+	//
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/satori/go.uuid"
@@ -98,7 +99,7 @@ func (app *App) GetSettings(name string) Settings {
 	if settings == nil {
 		return Settings{}
 	} else {
-		pubs := app.Conf.GetStringMap("Public")
+		pubs := app.Conf.GetStringMap("public")
 		for k, v := range pubs {
 			settings[k] = v
 		}
@@ -123,7 +124,7 @@ func (app *App) Mount(mg Moduler, mountbase string) {
 
 func (app *App) Run() {
 
-	binding := app.Conf.GetString("App.Bind-Address")
+	binding := app.Conf.GetString("app.bind-address")
 	app.Router.Use(CORSMiddleware())
 
 	app.Router.Run(binding)

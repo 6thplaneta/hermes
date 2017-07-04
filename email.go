@@ -19,25 +19,25 @@ func SendEmail(subject, body, address string, sender map[string]interface{}, htm
 	if sender == nil {
 		return errors.New("missing sender information")
 	}
-	if sender["SenderEmail"] != nil {
-		senderEmail = sender["SenderEmail"].(string)
+	if sender["sender_email"] != nil {
+		senderEmail = sender["sender_email"].(string)
 	} else {
 		return errors.New("missing SenderEmail parameter")
 	}
 
-	if sender["SenderPassword"] != nil {
-		senderPassword = sender["SenderPassword"].(string)
+	if sender["sender_password"] != nil {
+		senderPassword = sender["sender_password"].(string)
 	} else {
 		return errors.New("missing SenderPassword parameter")
 	}
-	if sender["Host"] != nil {
-		host = sender["Host"].(string)
+	if sender["host"] != nil {
+		host = sender["host"].(string)
 	} else {
 		return errors.New("missing Host parameter")
 	}
 
-	if sender["Port"] != nil {
-		port = sender["Port"].(string)
+	if sender["port"] != nil {
+		port = sender["port"].(string)
 	} else {
 		return errors.New("missing Port parameter")
 	}

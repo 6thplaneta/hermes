@@ -310,8 +310,8 @@ func embedCollection(token string, dbInstance *sqlx.DB, obj reflect.Value, field
 
 	} else {
 		_struct := StructsMap[manyToMany]
-
 		middleTableName, _ := GetTagValue(_struct, "Id", "hermes", "dbspace")
+
 		params := NewParams(destCollectionInst)
 
 		query = fmt.Sprintf("select %s from %s where %s_id=%d", fkey, middleTableName, structName, id)

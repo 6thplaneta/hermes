@@ -17,6 +17,7 @@ type Agent struct {
 	// Is_Super   bool   `json:"is_super" hermes:"editable"`
 	FId        string `json:"fid"`
 	GId        string `json:"gid"`
+	MId        string `json:"mid"`
 	Roles      []Role `json:"roles,omitempty" db:"-" hermes:"many2many:Role_Agent"`
 	Device     Device `db:"-" json:"device"`
 	Is_Deleted bool   `json:"is_deleted" hermes:"index,editable"`
@@ -44,15 +45,15 @@ func (col *AgentCollection) Create(token string, trans *sql.Tx, inpuser interfac
 
 	var newAgent Agent
 	agent := inpuser.(*Agent)
+
 	required_password := true
 	//sign up by facebook or gmail does not require password field for authentication
 	//and is active (doesn't require to use activation code to activate the agent)
-	if agent.FId != "" || agent.GId != "" {
+	if agent.FId != "" || agent.GId != "" || agent.MId != "" {
 		//
 		required_password = false
 		agent.Is_Active = true
 	}
-
 	newAgent = *agent
 	if required_password == true {
 		//check password required and format
@@ -78,7 +79,6 @@ func (col *AgentCollection) Create(token string, trans *sql.Tx, inpuser interfac
 	}
 
 	result, err := AgentColl.Collection.Create(token, nil, &newAgent)
-
 	if err != nil {
 		return &Agent{}, err
 	}

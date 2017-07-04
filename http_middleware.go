@@ -10,8 +10,8 @@ func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Location, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With, X-Forwarded-For")
-		c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Type, Location, Authorization, accept, origin, Cache-Control")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Location, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, Cache-Control, X-Requested-With, X-Forwarded-For")
+		c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Type, Location, Authorization, accept, Cache-Control")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
 
 		if c.Request.Method == "OPTIONS" {
