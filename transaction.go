@@ -11,5 +11,6 @@ func CreateTrans(token string, col Collectionist, obj interface{}) (interface{},
 		return result, err
 	}
 	trans.Commit()
+
 	return result, nil
 }

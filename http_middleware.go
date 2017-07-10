@@ -60,9 +60,11 @@ var GlobalRateLimiter *RateLimiter
 func RateLimitMiddleware(rl *RateLimiter) gin.HandlerFunc {
 	GlobalRateLimiter = rl
 	return func(c *gin.Context) {
+
 		// token := c.Request.Header.Get("Authorization")
 		ip := c.Request.RemoteAddr
 		pass := rl.Check(ip)
+
 		if !pass {
 			HandleHttpError(c, ErrRateExceed, application.Logger)
 		} else {

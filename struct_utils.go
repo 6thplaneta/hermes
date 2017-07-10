@@ -2,6 +2,7 @@ package hermes
 
 import (
 	"errors"
+	// "fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -82,6 +83,7 @@ func GetFieldsByTag(val interface{}, tag, key string) []string {
 * @return	string 			type of feild
  */
 func GetFieldExistanceAndType(val interface{}, name string) (bool, string) {
+
 	tval := reflect.TypeOf(val)
 	if tval.Kind() == reflect.Ptr {
 		tval = tval.Elem()
@@ -92,6 +94,7 @@ func GetFieldExistanceAndType(val interface{}, name string) (bool, string) {
 
 	arrFields := strings.Split(name, ".")
 	for i := 0; i < len(arrFields); i++ {
+
 		if i == 0 {
 
 			typeField, fieldExists = tval.FieldByName(arrFields[i])
@@ -106,21 +109,23 @@ func GetFieldExistanceAndType(val interface{}, name string) (bool, string) {
 		if !fieldExists {
 			return false, ""
 		}
+
 	}
 
-	strHermes := typeField.Tag.Get("hermes")
-	hermesType := GetValueOfTagByKey(strHermes, "type")
-	kind := typeField.Type.Kind().String()
+	// strHermes := typeField.Tag.Get("hermes")
+	// hermesType := GetValueOfTagByKey(strHermes, "type")
+	// kind := typeField.Type.Kind().String()
 
-	var typeOfField string
-	//if the kind is struct ,get type of feild from hermes tags
-	if kind != "struct" {
-		typeOfField = kind
-	} else {
-		if hermesType != "" {
-			typeOfField = hermesType
-		}
-	}
+	// var typeOfField string
+	// //if the kind is struct ,get type of feild from hermes tags
+	// if kind != "struct" {
+	// 	typeOfField = kind
+	// } else {
+	// 	if hermesType != "" {
+	// 		typeOfField = hermesType
+	// 	}
+	// }
+	typeOfField := strings.ToLower(typeField.Type.Name())
 
 	return true, typeOfField
 }

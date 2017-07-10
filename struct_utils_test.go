@@ -136,22 +136,22 @@ func TestGetFieldType(t *testing.T) {
 	assert.Error(t, err, "Property does not exists")
 }
 
-func TestGetTagValue(t *testing.T) {
-	type User struct {
-		Email      string    `hermes:"type:"`
-		Login_Date time.Time `hermes:"type:time"`
-	}
-	user := User{}
-	var val string
-	val, _ = GetTagValue(user, "Login_Date", "hermes", "type")
-	assert.Equal(t, "time", val)
+// func TestGetTagValue(t *testing.T) {
+// 	type User struct {
+// 		Email      string    `hermes:"type:"`
+// 		Login_Date time.Time `hermes:"type:time"`
+// 	}
+// 	user := User{}
+// 	var val string
+// 	val, _ = GetTagValue(user, "Login_Date", "hermes", "type")
+// 	assert.Equal(t, "time", val)
 
-	val, _ = GetTagValue(user, "email", "hermes", "type")
-	assert.Equal(t, "", val)
-	val, _ = GetTagValue(user, "notexistfield", "hermes", "type")
-	assert.Equal(t, "", val)
+// 	val, _ = GetTagValue(user, "email", "hermes", "type")
+// 	assert.Equal(t, "", val)
+// 	val, _ = GetTagValue(user, "notexistfield", "hermes", "type")
+// 	assert.Equal(t, "", val)
 
-}
+// }
 
 func TestHasValue(t *testing.T) {
 	type User struct {

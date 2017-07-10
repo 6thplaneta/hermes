@@ -1,7 +1,6 @@
 package hermes
 
 import (
-	// "fmt"
 	"time"
 )
 
@@ -19,6 +18,7 @@ func (rl *RateLimiter) Check(token string) bool {
 	if !ok {
 		//record does not exists
 		rl.records[token] = time.Now()
+
 		return true
 	} else {
 		if int64(time.Since(lastRec)) > rl.Interval*int64(time.Millisecond) {
@@ -43,6 +43,7 @@ func (rl *RateLimiter) Reset(token string) {
 }
 
 func NewRateLimiter(interval int64) *RateLimiter {
+
 	rl := &RateLimiter{}
 	rl.Interval = interval
 	rl.records = make(map[string]time.Time, 1000)

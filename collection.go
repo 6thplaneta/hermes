@@ -124,10 +124,11 @@ func (col *Collection) Meta() []FieldMeta {
 		}
 		if fm.Type == "struct" {
 			hermesType := GetValueOfTagByKey(hermesStr, "type")
+			// fmt.Println("hermes...", hermesType)
 			if hermesType == "" {
 				fm.IsRelation = true
 			} else {
-				fm.Type = hermesType
+				fm.Type = strings.ToLower(tpField.Type.Name())
 			}
 		}
 		fm.UI_HTML = GetValueOfTagByKey(hermesStr, "ui-html")
@@ -284,12 +285,12 @@ func (col *Collection) Create(token string, trans *sql.Tx, obj interface{}) (int
 
 	validationError := ValidateStruct(obj)
 	if validationError != nil {
-		return obj, validationError
+		return nil, validationError
 	}
 	//check for existing one2one nested objects to create before creation of the main object
 	err = PreUnPopulate(token, trans, obj)
 	if err != nil {
-		return obj, err
+		return nil, err
 	}
 
 	var id int64
@@ -303,7 +304,7 @@ func (col *Collection) Create(token string, trans *sql.Tx, obj interface{}) (int
 
 	if err != nil {
 		if !strings.Contains(err.Error(), Messages["DuplicateIndex"]) || col.Config.DuplicateError {
-			return obj, err
+			return nil, err
 		}
 	}
 
@@ -317,7 +318,7 @@ func (col *Collection) Create(token string, trans *sql.Tx, obj interface{}) (int
 	//check for one2many and many2many relations and create the related objects
 	err = UnPopulate(token, trans, obj)
 	if err != nil {
-		return obj, err
+		return nil, err
 	}
 	//insert object in elastic search if seaarch engine is elastic
 	col.IndexDocument(obj)
