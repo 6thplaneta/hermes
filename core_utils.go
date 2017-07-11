@@ -10,6 +10,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func TrimSuffix(s, suffix string) string {
@@ -25,6 +28,18 @@ func TrimSuffix(s, suffix string) string {
 * @param 	[]string 		array
 * @return	bool 			determines if value exists or not.
  */
+
+func ListenForKill(f func()) {
+	osSignal := make(chan os.Signal, 1)
+	signal.Notify(osSignal, syscall.SIGPWR, syscall.SIGABRT, syscall.SIGQUIT, syscall.SIGSTOP, syscall.SIGKILL,
+		syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<- osSignal
+		f()
+		os.Exit(0)
+	}()
+}
+
 func strInArr(st string, arr []string) bool {
 	for _, s := range arr {
 		if s == st {
