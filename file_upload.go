@@ -52,7 +52,7 @@ func Upload(c *gin.Context, inputName, savePath string) (string, error) {
 	}
 	//create new file with
 
-	f, err := os.OpenFile(path_+uniquefid+path.Ext(handler.Filename), os.O_WRONLY|os.O_CREATE, 0666)
+	f, err := os.OpenFile(path_+uniquefid+path.Ext(handler.Filename), os.O_WRONLY|os.O_CREATE, 0777)
 	if err != nil {
 		return "", err
 	}

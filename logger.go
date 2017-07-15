@@ -27,7 +27,7 @@ func timeFormatter(t time.Time) string {
 }
 func (logger *Logger) InitLogs(path string) {
 	filepath := path + "log.txt"
-	logFile, err := os.OpenFile(filepath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	logFile, err := os.OpenFile(filepath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0777)
 	if err != nil {
 		fmt.Println("Error in opening log file", err)
 		panic(err)
@@ -43,7 +43,7 @@ func (logger *Logger) InitLogs(path string) {
 			panic(err)
 		}
 
-		logFile, err = os.OpenFile(filepath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		logFile, err = os.OpenFile(filepath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0777)
 		if err != nil {
 			fmt.Println("Error in opening log file", err)
 			panic(err)
