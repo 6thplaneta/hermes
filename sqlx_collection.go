@@ -127,6 +127,12 @@ func getInsertQuery(obj interface{}) string {
 							intv, _ := strconv.Atoi(defaultv)
 							fname.Set(reflect.ValueOf(intv))
 						}
+					} else if typeOfField == "int64" {
+						intv := fname.Interface().(int64)
+						if intv == 0 {
+							intv, _ := strconv.ParseInt(defaultv, 10, 64)
+							fname.Set(reflect.ValueOf(intv))
+						}
 					} else if typeOfField == "bool" {
 						boolv := fname.Interface().(bool)
 						if boolv == false {
@@ -329,6 +335,8 @@ func SyncSchema(db *sqlx.DB, table interface{}) error {
 				typ = "text"
 			} else if typeOfField == "int" {
 				typ = "integer"
+			} else if typeOfField == "int64" {
+				typ = "bigint"
 			} else if typeOfField == "bool" {
 				typ = "boolean"
 			} else if typeOfField == "time" {
@@ -595,6 +603,9 @@ func Report(datasrc *DataSrc, instance interface{}, fields []string, page, pageS
 				} else if tp == "int" {
 					myFields[groupByField] = 0
 					queryValuesPtr[ind] = new(int)
+				} else if tp == "int64" {
+					myFields[groupByField] = 0
+					queryValuesPtr[ind] = new(int64)
 				} else if tp == "bool" {
 					myFields[groupByField] = false
 					queryValuesPtr[ind] = new(bool)

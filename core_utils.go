@@ -7,12 +7,12 @@ import (
 	"github.com/antonholmquist/jason"
 	"math/rand"
 	"net/http"
-	"strconv"
-	"strings"
-	"time"
 	"os"
 	"os/signal"
+	"strconv"
+	"strings"
 	"syscall"
+	"time"
 )
 
 func TrimSuffix(s, suffix string) string {
@@ -34,7 +34,7 @@ func ListenForKill(f func()) {
 	signal.Notify(osSignal, syscall.SIGPWR, syscall.SIGABRT, syscall.SIGQUIT, syscall.SIGSTOP, syscall.SIGKILL,
 		syscall.SIGINT, syscall.SIGTERM)
 	go func() {
-		<- osSignal
+		<-osSignal
 		f()
 		os.Exit(0)
 	}()
@@ -116,6 +116,10 @@ func CastToStr(vl interface{}, typ, dbtype string) string {
 		val, _ := vl.(int)
 		castedVal = strconv.Itoa(val)
 		break
+	case "int64":
+		val, _ := vl.(int64)
+		castedVal = strconv.FormatInt(val, 10)
+		break
 	case "float64":
 		val, _ := vl.(float64)
 		castedVal = strconv.FormatFloat(val, 'g', -1, 64)
@@ -148,6 +152,16 @@ func CastArrToStr(vl interface{}, typ, dbtype string) string {
 		}
 		for _, v := range arr {
 			cs = CastToStr(v, "int", dbtype)
+
+			rs += cs + ","
+		}
+	} else if typ == "int64" {
+		arr := vl.([]int64)
+		if len(arr) == 0 {
+			return ""
+		}
+		for _, v := range arr {
+			cs = CastToStr(v, "int64", dbtype)
 
 			rs += cs + ","
 		}
@@ -220,6 +234,10 @@ func CastStrToVal(strValue, typ string) interface{} {
 		inted, _ := strconv.Atoi(strValue)
 		castedVal = inted
 		break
+	case "int64":
+		inted, _ := strconv.ParseInt(strValue, 10, 64)
+		castedVal = inted
+		break
 	case "float64":
 		f, _ := strconv.ParseFloat(strValue, 64)
 		castedVal = f
@@ -255,6 +273,13 @@ func CastStrToArr(strValue, typeOfField string) interface{} {
 		var castedVal []int
 		for _, v := range vals {
 			castedVal = append(castedVal, CastStrToVal(v, typeOfField).(int))
+		}
+		return castedVal
+
+	case "int64":
+		var castedVal []int64
+		for _, v := range vals {
+			castedVal = append(castedVal, CastStrToVal(v, typeOfField).(int64))
 		}
 		return castedVal
 	case "float64":
