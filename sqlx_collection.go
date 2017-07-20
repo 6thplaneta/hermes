@@ -18,6 +18,8 @@ func ChangeGoTypeToPostgres(typeOfField, dbtype string) string {
 		typ = "text"
 	} else if typeOfField == "int" {
 		typ = "integer"
+	} else if typeOfField == "int64" {
+		typ = "bigint"
 	} else if typeOfField == "bool" {
 		typ = "boolean"
 	} else if typeOfField == "time" {
