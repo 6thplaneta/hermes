@@ -8,8 +8,21 @@ import (
 
 //This function gets error key and returns appropriate message regarding to this key
 func HandleHttpError(c *gin.Context, err error, logger *Logger) {
+	txt := c.Request.RequestURI + " "
+
+	if logger.Level >= 5 {
+		token := c.Request.Header.Get("Authorization")
+		if token == "" {
+			txt = txt + "empty "
+
+		} else {
+			txt = txt + token + " "
+		}
+
+	}
+
 	if logger != nil {
-		logger.Error(err.Error())
+		logger.Error(txt + err.Error())
 	}
 	// all errors are internal unless equal specified errors or have Error structure and NotValid/BadRequest Key
 	statusCode := http.StatusInternalServerError

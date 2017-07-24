@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -50,21 +51,21 @@ func (logger *Logger) InitLogs(path string) {
 		}
 	}
 
-	logger.TheLogger = log.New(logFile,
+	logger.TheLogger = log.New(os.Stdout,
 		"",
-		log.Ldate|log.Ltime|log.Lshortfile)
+		log.Ldate|log.Ltime)
 }
 
 func (logger *Logger) Error(message string) {
 	if logger.Level > 0 {
-		txt := "ERROR:" + message
+		txt := "ERROR " + message
 		logger.TheLogger.Println(txt)
 	}
 }
 
 func (logger *Logger) Warning(message string) {
 	if logger.Level > 1 {
-		txt := "Warning:" + message
+		txt := "Warning " + message
 		logger.TheLogger.Println(txt)
 	}
 
@@ -72,47 +73,67 @@ func (logger *Logger) Warning(message string) {
 
 func (logger *Logger) Info(message string) {
 	if logger.Level > 2 {
-		txt := "Info:" + message
+		txt := "Info " + message
 		logger.TheLogger.Println(txt)
 	}
 }
 
 func (logger *Logger) Trace(message string) {
 	if logger.Level > 3 {
-		txt := "Trace:" + message
+		txt := "Trace " + message
 		logger.TheLogger.Println(txt)
 	}
 }
 
 func (logger *Logger) LogHttpByBody(c *gin.Context, body string) {
 
-	txt := "HTTP Request, Method: " + c.Request.Method + " IP: " + c.ClientIP() + " Path:" + c.Request.RequestURI
+	// txt := "HTTP Request, Method: " + c.Request.Method + " IP: " + c.ClientIP() + " Path:" + c.Request.RequestURI
+	txt := c.Request.RequestURI + " "
+
 	if logger.Level >= 5 {
-		txt = txt + " Token: " + c.Request.Header.Get("Authorization")
+		token := c.Request.Header.Get("Authorization")
+		if token == "" {
+			txt = txt + "empty "
+
+		} else {
+			txt = txt + token + " "
+		}
+
 	}
 	if logger.Level >= 6 {
 		if c.Request.RequestURI != "/upload" {
-			txt = txt + " Data: " + body
+			txt = txt + strings.Replace(body, "\n", "", -1)
 		}
 	}
 	logger.Trace(txt)
 }
 func (logger *Logger) LogHttp(c *gin.Context) {
-	txt := "HTTP Request, Method: " + c.Request.Method + " IP: " + c.ClientIP() + " Path:" + c.Request.RequestURI
+	// txt := "HTTP Request, Method: " + c.Request.Method + " IP: " + c.ClientIP() + " Path:" + c.Request.RequestURI
+	txt := c.Request.RequestURI + " "
+
 	if logger.Level >= 5 {
-		txt = txt + " Token: " + c.Request.Header.Get("Authorization")
+		token := c.Request.Header.Get("Authorization")
+		if token == "" {
+			txt = txt + "empty "
+
+		} else {
+			txt = txt + token + " "
+		}
+
 	}
 	if logger.Level >= 6 {
 
 		reqBody := c.Request.Body
 
-		body, _ := ioutil.ReadAll(reqBody)
+		body, err := ioutil.ReadAll(reqBody)
 
-		rdr1 := ioutil.NopCloser(bytes.NewBuffer(body))
-		c.Request.Body = rdr1
+		if err == nil {
+			rdr1 := ioutil.NopCloser(bytes.NewBuffer(body))
+			c.Request.Body = rdr1
 
-		if c.Request.RequestURI != "/upload" {
-			txt = txt + " Data: " + string(body)
+			if c.Request.RequestURI != "/upload" {
+				txt = txt + strings.Replace(string(body), "\n", "", -1)
+			}
 		}
 	}
 	logger.Trace(txt)
