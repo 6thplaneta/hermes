@@ -57,10 +57,10 @@ func RegisterCollection(col Collectionist) {
 type Collectionist interface {
 	GetInstance() interface{}
 	GetInstanceType() reflect.Type
-	Delete(string, int) error
+	Delete(*sql.Tx, string, int) error
 	GetDataSrc() *DataSrc
 	Create(string, *sql.Tx, interface{}) (interface{}, error)
-	Update(string, int, interface{}) error
+	Update(string, *sql.Tx, int, interface{}) error
 	List(string, *Params, *Paging, string, string) (interface{}, error)
 	ListQuery(string, string) (interface{}, error)
 	Get(string, int, string) (interface{}, error)
@@ -254,12 +254,19 @@ func (col *Collection) GetInstanceType() reflect.Type {
 }
 
 // delete object by id
-func (col *Collection) Delete(token string, id int) error {
+func (col *Collection) Delete(trans *sql.Tx, token string, id int) error {
 	cnf := col.Conf()
 	if !Authorize(token, cnf.Authorizations.Delete, id, "DELETE", cnf.CheckAccess) {
 		return ErrForbidden
 	}
-	r, err := col.DataSrc.DB.Exec(fmt.Sprintf("delete from %s where Id= %d", col.Dbspace, id))
+	var err error
+	var r sql.Result
+	if trans == nil {
+		r, err = col.DataSrc.DB.Exec(fmt.Sprintf("delete from %s where Id= %d", col.Dbspace, id))
+	} else {
+		r, err = trans.Exec(fmt.Sprintf("delete from %s where Id= %d", col.Dbspace, id))
+	}
+
 	if err != nil {
 		return err
 	}
@@ -336,7 +343,7 @@ func (col *Collection) IndexDocument(obj interface{}) {
 }
 
 // single object update
-func (col *Collection) Update(token string, id int, obj interface{}) error {
+func (col *Collection) Update(token string, trans *sql.Tx, id int, obj interface{}) error {
 	cnf := col.Conf()
 	if !Authorize(token, cnf.Authorizations.Update, id, "UPDATE", cnf.CheckAccess) {
 		return ErrForbidden
@@ -356,7 +363,15 @@ func (col *Collection) Update(token string, id int, obj interface{}) error {
 	if err != nil {
 		return err
 	}
-	_, err = col.DataSrc.DB.Exec(strq)
+
+	if trans == nil {
+		_, err = col.DataSrc.DB.Exec(strq)
+
+	} else {
+		_, err = trans.Exec(strq)
+
+	}
+
 	if err != nil {
 		return err
 	}

@@ -27,31 +27,31 @@ func timeFormatter(t time.Time) string {
 	return strconv.Itoa(t.Year()) + "_" + strconv.Itoa(int(t.Month())) + "_" + strconv.Itoa(t.Day()) + "_" + strconv.Itoa(t.Hour()) + "_" + strconv.Itoa(t.Minute()) + "_" + strconv.Itoa(t.Second())
 }
 func (logger *Logger) InitLogs(path string) {
-	// filepath := path + "log.txt"
-	// logFile, err := os.OpenFile(filepath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0777)
-	// if err != nil {
-	// 	fmt.Println("Error in opening log file", err)
-	// 	panic(err)
-	// }
+	filepath := path + "log.txt"
+	logFile, err := os.OpenFile(filepath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0777)
+	if err != nil {
+		fmt.Println("Error in opening log file", err)
+		panic(err)
+	}
 
-	// st, _ := logFile.Stat()
-	// if st.Size() > 1024*1024 { // 1 MB
-	// 	logFile.Close()
-	// 	newpath := filepath + "." + timeFormatter(time.Now())
-	// 	err = os.Rename(filepath, newpath)
-	// 	if err != nil {
-	// 		fmt.Println("Error in renaming old log file", err)
-	// 		panic(err)
-	// 	}
+	st, _ := logFile.Stat()
+	if st.Size() > 1024*1024 { // 1 MB
+		logFile.Close()
+		newpath := filepath + "." + timeFormatter(time.Now())
+		err = os.Rename(filepath, newpath)
+		if err != nil {
+			fmt.Println("Error in renaming old log file", err)
+			panic(err)
+		}
 
-	// 	logFile, err = os.OpenFile(filepath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0777)
-	// 	if err != nil {
-	// 		fmt.Println("Error in opening log file", err)
-	// 		panic(err)
-	// 	}
-	// }
+		logFile, err = os.OpenFile(filepath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0777)
+		if err != nil {
+			fmt.Println("Error in opening log file", err)
+			panic(err)
+		}
+	}
 
-	logger.TheLogger = log.New(os.Stdout,
+	logger.TheLogger = log.New(logFile,
 		"",
 		log.Ldate|log.Ltime)
 }

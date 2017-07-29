@@ -172,7 +172,7 @@ func (cont *Controller) Delete(c *gin.Context) {
 		return
 	}
 	token := c.Request.Header.Get("Authorization")
-	if err := cont.Coll.Delete(token, id); err != nil {
+	if err := cont.Coll.Delete(nil, token, id); err != nil {
 		HandleHttpError(c, err, application.Logger)
 		return
 	}
@@ -193,7 +193,7 @@ func (cont *Controller) Update(c *gin.Context) {
 
 	c.BindJSON(obj)
 	token := c.Request.Header.Get("Authorization")
-	err := cont.Coll.Update(token, id, obj)
+	err := cont.Coll.Update(token, nil, id, obj)
 	if err != nil {
 		HandleHttpError(c, err, application.Logger)
 		return

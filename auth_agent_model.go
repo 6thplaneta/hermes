@@ -95,7 +95,7 @@ func (col *AgentCollection) Create(token string, trans *sql.Tx, inpuser interfac
 }
 
 //override
-func (col *AgentCollection) Update(token string, id int, obj interface{}) error {
+func (col *AgentCollection) Update(token string, trans *sql.Tx, id int, obj interface{}) error {
 	var err error
 	cnf := col.Conf()
 	if !Authorize(token, cnf.Authorizations.Update, id, "UPDATE", cnf.CheckAccess) {
@@ -111,7 +111,7 @@ func (col *AgentCollection) Update(token string, id int, obj interface{}) error 
 			token = SystemToken
 		}
 	}
-	err = AgentColl.Collection.Update(token, id, obj)
+	err = AgentColl.Collection.Update(token, trans, id, obj)
 	if err != nil {
 		return err
 	}
@@ -358,7 +358,7 @@ func (col *AgentCollection) FBLogin(agent Agent, accessToken string) (AgentToken
 		//fill fid if the agent exists before and hasn't facebook id
 		if lagent.FId == "" {
 			lagent.FId = fid
-			err = col.Update(SystemToken, lagent.Id, lagent)
+			err = col.Update(SystemToken, trans, lagent.Id, lagent)
 			if err != nil {
 				return AgentToken{}, err
 			}
@@ -388,7 +388,7 @@ func (col *AgentCollection) ActiveUserByToken(act_token string) error {
 	agent := result.(*Agent)
 	//activate the agent and update the agent
 	agent.Is_Active = true
-	err = AgentColl.Update(SystemToken, agent.Id, agent)
+	err = AgentColl.Update(SystemToken, nil, agent.Id, agent)
 	if err != nil {
 		return err
 	}
@@ -510,7 +510,7 @@ func (col *AgentCollection) Login(agent Agent, url string) (AgentToken, error) {
 
 		newToken.Device_Id = rdevice.Id
 
-		err := DeviceColl.Update(SystemToken, rdevice.Id, rdevice)
+		err := DeviceColl.Update(SystemToken, nil, rdevice.Id, rdevice)
 
 		if err != nil && !strings.Contains(err.Error(), Messages["DuplicateIndex"]) {
 
