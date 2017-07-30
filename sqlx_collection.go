@@ -20,6 +20,10 @@ func ChangeGoTypeToPostgres(typeOfField, dbtype string) string {
 		typ = "integer"
 	} else if typeOfField == "int64" {
 		typ = "bigint"
+	} else if typeOfField == "int32" || typeOfField == "rune" {
+		typ = "integer"
+	} else if typeOfField == "int16" {
+		typ = "smallint"
 	} else if typeOfField == "bool" {
 		typ = "boolean"
 	} else if typeOfField == "time" {
@@ -131,6 +135,24 @@ func getInsertQuery(obj interface{}) string {
 						intv := fname.Interface().(int64)
 						if intv == 0 {
 							intv, _ := strconv.ParseInt(defaultv, 10, 64)
+							fname.Set(reflect.ValueOf(intv))
+						}
+					} else if typeOfField == "int32" {
+						intv := fname.Interface().(int32)
+						if intv == 0 {
+							intv, _ := strconv.ParseInt(defaultv, 10, 32)
+							fname.Set(reflect.ValueOf(intv))
+						}
+					} else if typeOfField == "rune" {
+						intv := fname.Interface().(rune)
+						if intv == 0 {
+							intv, _ := strconv.ParseInt(defaultv, 10, 32)
+							fname.Set(reflect.ValueOf(intv))
+						}
+					} else if typeOfField == "int16" {
+						intv := fname.Interface().(int16)
+						if intv == 0 {
+							intv, _ := strconv.ParseInt(defaultv, 10, 16)
 							fname.Set(reflect.ValueOf(intv))
 						}
 					} else if typeOfField == "bool" {
@@ -337,6 +359,12 @@ func SyncSchema(db *sqlx.DB, table interface{}) error {
 				typ = "integer"
 			} else if typeOfField == "int64" {
 				typ = "bigint"
+			} else if typeOfField == "int32" {
+				typ = "integer"
+			} else if typeOfField == "rune" {
+				typ = "integer"
+			} else if typeOfField == "int16" {
+				typ = "smallint"
 			} else if typeOfField == "bool" {
 				typ = "boolean"
 			} else if typeOfField == "time" {
@@ -606,6 +634,15 @@ func Report(datasrc *DataSrc, instance interface{}, fields []string, page, pageS
 				} else if tp == "int64" {
 					myFields[groupByField] = 0
 					queryValuesPtr[ind] = new(int64)
+				} else if tp == "int32" {
+					myFields[groupByField] = 0
+					queryValuesPtr[ind] = new(int32)
+				} else if tp == "rune" {
+					myFields[groupByField] = 0
+					queryValuesPtr[ind] = new(rune)
+				} else if tp == "int16" {
+					myFields[groupByField] = 0
+					queryValuesPtr[ind] = new(int16)
 				} else if tp == "bool" {
 					myFields[groupByField] = false
 					queryValuesPtr[ind] = new(bool)

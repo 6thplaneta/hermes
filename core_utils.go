@@ -120,6 +120,18 @@ func CastToStr(vl interface{}, typ, dbtype string) string {
 		val, _ := vl.(int64)
 		castedVal = strconv.FormatInt(val, 10)
 		break
+	case "int32":
+		val, _ := vl.(int32)
+		castedVal = strconv.FormatInt(int64(val), 10)
+		break
+	case "rune":
+		val, _ := vl.(rune)
+		castedVal = strconv.FormatInt(int64(val), 10)
+		break
+	case "int16":
+		val, _ := vl.(int16)
+		castedVal = strconv.FormatInt(int64(val), 10)
+		break
 	case "float64":
 		val, _ := vl.(float64)
 		castedVal = strconv.FormatFloat(val, 'g', -1, 64)
@@ -162,6 +174,36 @@ func CastArrToStr(vl interface{}, typ, dbtype string) string {
 		}
 		for _, v := range arr {
 			cs = CastToStr(v, "int64", dbtype)
+
+			rs += cs + ","
+		}
+	} else if typ == "int32" {
+		arr := vl.([]int32)
+		if len(arr) == 0 {
+			return ""
+		}
+		for _, v := range arr {
+			cs = CastToStr(v, "int32", dbtype)
+
+			rs += cs + ","
+		}
+	} else if typ == "rune" {
+		arr := vl.([]rune)
+		if len(arr) == 0 {
+			return ""
+		}
+		for _, v := range arr {
+			cs = CastToStr(v, "rune", dbtype)
+
+			rs += cs + ","
+		}
+	} else if typ == "int16" {
+		arr := vl.([]int16)
+		if len(arr) == 0 {
+			return ""
+		}
+		for _, v := range arr {
+			cs = CastToStr(v, "int16", dbtype)
 
 			rs += cs + ","
 		}
@@ -238,6 +280,18 @@ func CastStrToVal(strValue, typ string) interface{} {
 		inted, _ := strconv.ParseInt(strValue, 10, 64)
 		castedVal = inted
 		break
+	case "int32":
+		inted, _ := strconv.ParseInt(strValue, 10, 32)
+		castedVal = inted
+		break
+	case "rune":
+		inted, _ := strconv.ParseInt(strValue, 10, 32)
+		castedVal = inted
+		break
+	case "int16":
+		inted, _ := strconv.ParseInt(strValue, 10, 16)
+		castedVal = inted
+		break
 	case "float64":
 		f, _ := strconv.ParseFloat(strValue, 64)
 		castedVal = f
@@ -280,6 +334,24 @@ func CastStrToArr(strValue, typeOfField string) interface{} {
 		var castedVal []int64
 		for _, v := range vals {
 			castedVal = append(castedVal, CastStrToVal(v, typeOfField).(int64))
+		}
+		return castedVal
+	case "int32":
+		var castedVal []int32
+		for _, v := range vals {
+			castedVal = append(castedVal, CastStrToVal(v, typeOfField).(int32))
+		}
+		return castedVal
+	case "rune":
+		var castedVal []rune
+		for _, v := range vals {
+			castedVal = append(castedVal, CastStrToVal(v, typeOfField).(rune))
+		}
+		return castedVal
+	case "int16":
+		var castedVal []int16
+		for _, v := range vals {
+			castedVal = append(castedVal, CastStrToVal(v, typeOfField).(int16))
 		}
 		return castedVal
 	case "float64":
@@ -355,4 +427,17 @@ func RandStringRunes(n int) string {
 		b[i] = letterRunes[rand.Intn(len(letterRunes))]
 	}
 	return string(b)
+}
+
+func Contains(s []string, e string) bool {
+	if s == nil {
+		return false
+
+	}
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }

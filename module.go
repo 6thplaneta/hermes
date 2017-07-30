@@ -17,7 +17,7 @@ type Moduler interface {
 	GetName() string
 	GetPath() string
 	Meta(c *gin.Context)
-	SetCrudRoutes(Controlist)
+	SetCrudRoutes(Controlist, []string)
 	GET(string, gin.HandlerFunc) gin.IRoutes
 	POST(string, gin.HandlerFunc) gin.IRoutes
 	PUT(string, gin.HandlerFunc) gin.IRoutes
@@ -99,23 +99,43 @@ func (mg *Module) Mount(nmg Moduler, mountbase string) {
 	mg.App.Router.GET(mg.MountPath+mountbase+"/meta", nmg.Meta)
 }
 
-func (mg *Module) SetCrudRoutes(cont Controlist) {
+func (mg *Module) SetCrudRoutes(cont Controlist, excludes []string) {
 
 	var base string = cont.GetBase()
 	mg.App.Router.POST(base, cont.Create)
 	// because gin does not have regexp!
-	mg.App.Router.GET(base+"/items/:id", cont.Get)
-	mg.App.Router.GET(base+"/report", cont.Report)
-	mg.App.Router.GET(base+"/meta", cont.Meta)
+	if !Contains(excludes, "Get") {
+		mg.App.Router.GET(base+"/items/:id", cont.Get)
+	}
+	if !Contains(excludes, "Report") {
+		mg.App.Router.GET(base+"/report", cont.Report)
+	}
+	if !Contains(excludes, "Meta") {
+		mg.App.Router.GET(base+"/meta", cont.Meta)
+	}
 	// mg.App.Router.GET(base+"/report", cont.Report)
-	mg.App.Router.GET(base, cont.List)
-	mg.App.Router.DELETE(base+"/items/:id", cont.Delete)
-	mg.App.Router.PUT(base+"/items/:id", cont.Update)
-	mg.App.Router.POST(base+"/items/:id/relation/:field", cont.Rel)
-	mg.App.Router.PUT(base+"/items/:id/relation/:field", cont.UpdateRel)
-	mg.App.Router.DELETE(base+"/items/:id/relation/:field", cont.UnRel)
-	mg.App.Router.GET(base+"/items/:id/relation/:field", cont.GetRel)
+	if !Contains(excludes, "List") {
+		mg.App.Router.GET(base, cont.List)
+	}
+	if !Contains(excludes, "Delete") {
+		mg.App.Router.DELETE(base+"/items/:id", cont.Delete)
+	}
+	if !Contains(excludes, "Update") {
+		mg.App.Router.PUT(base+"/items/:id", cont.Update)
+	}
+	if !Contains(excludes, "Rel") {
+		mg.App.Router.POST(base+"/items/:id/relation/:field", cont.Rel)
+	}
+	if !Contains(excludes, "UpdateRel") {
+		mg.App.Router.PUT(base+"/items/:id/relation/:field", cont.UpdateRel)
+	}
+	if !Contains(excludes, "UnRel") {
+		mg.App.Router.DELETE(base+"/items/:id/relation/:field", cont.UnRel)
+	}
+	if !Contains(excludes, "GetRel") {
+		mg.App.Router.GET(base+"/items/:id/relation/:field", cont.GetRel)
 
+	}
 }
 
 func (mg *Module) SetRelRoutes(cont Controlist) {

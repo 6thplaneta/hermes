@@ -80,7 +80,7 @@ func setRoutes(app *App) {
 	app.Router.GET(permCont.GetBase()+"/meta", permCont.Meta)
 
 	//auth apis
-	AuthorizationModule.SetCrudRoutes(agentCont)
+	AuthorizationModule.SetCrudRoutes(agentCont, []string{})
 	AuthorizationModule.POST("/login", agentCont.Login)
 	AuthorizationModule.POST("/flogin/:ftoken", agentCont.FBLogin)
 	AuthorizationModule.GET("/logout/:token", agentCont.Logout)
@@ -89,10 +89,10 @@ func setRoutes(app *App) {
 	AuthorizationModule.POST("/changePasswordByToken/:token", agentCont.ChangePasswordByToken)
 	AuthorizationModule.GET("/activeUser/:token", agentCont.ActiveUserByToken)
 
-	AuthorizationModule.SetCrudRoutes(rolePermCont)
-	AuthorizationModule.SetCrudRoutes(roleAgentCont)
-	AuthorizationModule.SetCrudRoutes(roleCont)
-	AuthorizationModule.SetCrudRoutes(agentTokenCont)
+	AuthorizationModule.SetCrudRoutes(rolePermCont, []string{})
+	AuthorizationModule.SetCrudRoutes(roleAgentCont, []string{})
+	AuthorizationModule.SetCrudRoutes(roleCont, []string{})
+	AuthorizationModule.SetCrudRoutes(agentTokenCont, []string{})
 
 	deviceCont = AuthorizationModule.NewController(DeviceColl, "/devices")
 	app.Router.GET(deviceCont.GetBase()+"/meta", deviceCont.Meta)

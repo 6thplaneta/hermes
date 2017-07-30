@@ -131,3 +131,13 @@ func (app *App) Run() {
 	// http.ListenAndServe(binding, app.Router)
 
 }
+
+func (app *App) RunTLS(certFile, keyFile string) {
+
+	binding := app.Conf.GetString("app.bind-address")
+	app.Router.Use(CORSMiddleware())
+
+	app.Router.RunTLS(binding, certFile, keyFile)
+	// http.ListenAndServe(binding, app.Router)
+
+}
