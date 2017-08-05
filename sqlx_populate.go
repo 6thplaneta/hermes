@@ -162,7 +162,7 @@ func PopulateStruct(token string, dbInstance *sqlx.DB, value interface{}, popula
 * @param	string 			field to populate (example: cities,provinces,student(user))
 * @return	error 			error
  */
-func PopulateCollection(token string, dbInstance *sqlx.DB, collection interface{}, instance interface{}, populate string) error {
+func PopulateCollection(token string, dbInstance *sqlx.DB, collection interface{}, populate string) error {
 
 	arrPopulate := strPopulateToArr(populate)
 	colv := reflect.ValueOf(collection)
@@ -175,6 +175,7 @@ func PopulateCollection(token string, dbInstance *sqlx.DB, collection interface{
 		return nil
 	}
 
+	instance := colv.Index(0).Interface()
 	for strPopulate, innerPopulate := range arrPopulate {
 
 		strPopulate = GetFieldJsonByInst(instance, strPopulate)

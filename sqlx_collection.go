@@ -584,7 +584,7 @@ func GetCollection(token string, datasrc *DataSrc, instance interface{}, params 
 	ress := x.Interface()
 	if populate != "" {
 
-		err = PopulateCollection(SystemToken, db, ress, instance, populate)
+		err = PopulateCollection(SystemToken, db, ress, populate)
 	}
 	return ress, err
 }
