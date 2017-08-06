@@ -8,7 +8,13 @@ import (
 
 //This function gets error key and returns appropriate message regarding to this key
 func HandleHttpError(c *gin.Context, err error, logger *Logger) {
-	txt := c.Request.RequestURI + " "
+	var txt string
+	// txt := "HTTP Request, Method: " + c.Request.Method + " IP: " + c.ClientIP() + " Path:" + c.Request.RequestURI
+	serverName, serverIp, err1 := HostInfo()
+	if err1 == nil {
+		txt = serverName + " " + serverIp + " "
+	}
+	txt += c.Request.RequestURI + " " + c.Request.Method + " " + c.ClientIP()
 
 	if logger.Level >= 5 {
 		token := c.Request.Header.Get("Authorization")

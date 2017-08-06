@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/antonholmquist/jason"
 	"math/rand"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -440,4 +441,43 @@ func Contains(s []string, e string) bool {
 		}
 	}
 	return false
+}
+
+//HostInfo returns serverName and IP address
+func HostInfo() (string, string, error) {
+	net_ifaces, err := net.Interfaces()
+	if err != nil {
+		return "", "", err
+	}
+	for _, net_iface := range net_ifaces {
+		if net_iface.Flags&net.FlagUp == 0 {
+			continue // interface down
+		}
+		if net_iface.Flags&net.FlagLoopback != 0 {
+			continue // loopback interface
+		}
+		addrs, err := net_iface.Addrs()
+		if err != nil {
+			return "", "", err
+		}
+		for _, addr := range addrs {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+			if ip == nil || ip.IsLoopback() {
+				continue
+			}
+			ip = ip.To4()
+			if ip == nil {
+				continue // not an ipv4 address
+			}
+			OSStr, _ := os.Hostname()
+			return string(OSStr), ip.String(), nil
+		}
+	}
+	return "", "", errors.New("No Network Available!")
 }

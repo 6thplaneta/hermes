@@ -32,6 +32,7 @@ func (logger *Logger) InitLogs(path string) {
 	if err != nil {
 		fmt.Println("Error in opening log file", err)
 		panic(err)
+
 	}
 
 	st, _ := logFile.Stat()
@@ -48,6 +49,7 @@ func (logger *Logger) InitLogs(path string) {
 		if err != nil {
 			fmt.Println("Error in opening log file", err)
 			panic(err)
+
 		}
 	}
 
@@ -86,9 +88,13 @@ func (logger *Logger) Trace(message string) {
 }
 
 func (logger *Logger) LogHttpByBody(c *gin.Context, body string) {
-
+	var txt string
 	// txt := "HTTP Request, Method: " + c.Request.Method + " IP: " + c.ClientIP() + " Path:" + c.Request.RequestURI
-	txt := c.Request.RequestURI + " "
+	serverName, serverIp, err := HostInfo()
+	if err == nil {
+		txt = serverName + " " + serverIp + " "
+	}
+	txt += c.Request.RequestURI + " " + c.Request.Method + " " + c.ClientIP()
 
 	if logger.Level >= 5 {
 		token := c.Request.Header.Get("Authorization")
@@ -108,8 +114,15 @@ func (logger *Logger) LogHttpByBody(c *gin.Context, body string) {
 	logger.Trace(txt)
 }
 func (logger *Logger) LogHttp(c *gin.Context) {
+	var txt string
 	// txt := "HTTP Request, Method: " + c.Request.Method + " IP: " + c.ClientIP() + " Path:" + c.Request.RequestURI
-	txt := c.Request.RequestURI + " "
+	serverName, serverIp, err := HostInfo()
+
+	if err == nil {
+		txt = serverName + " " + serverIp + " "
+	}
+
+	txt += c.Request.RequestURI + " " + c.Request.Method + " " + c.ClientIP()
 
 	if logger.Level >= 5 {
 		token := c.Request.Header.Get("Authorization")
