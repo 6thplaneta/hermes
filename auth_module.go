@@ -20,7 +20,11 @@ func createCollections(app *App) error {
 	permColl, collErr = NewDBCollection(&Permission{}, app.DataSrc)
 	roleColl, collErr = NewDBCollection(&Role{}, app.DataSrc)
 	rolePermColl, collErr = NewDBCollection(&Role_Permission{}, app.DataSrc)
+	RoleAgentColl.Conf().SetAuth("Create Role Permission", "Get Role Permission", "List Role Permission", "Update Role Permission", "Delete Role Permission", "Update Role Permission")
+
 	RoleAgentColl, collErr = NewDBCollection(&Role_Agent{}, app.DataSrc)
+	RoleAgentColl.Conf().SetAuth("Create Role Agent", "Get Role Agent", "List Role Agent", "Update Role Agent", "Delete Role Agent", "Update Role Agent")
+
 	AgentColl, collErr = NewAgentCollection(app.DataSrc)
 
 	AgentTokenColl, collErr = NewAgentTokenCollection(&AgentToken{}, app.DataSrc)

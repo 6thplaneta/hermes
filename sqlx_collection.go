@@ -399,6 +399,7 @@ func SyncSchema(db *sqlx.DB, table interface{}) error {
 	if err != nil {
 		return err
 	}
+
 	for j := 0; j < len(dbcols); j++ {
 		//drop database column if don't exist in struct
 		_, exists := structFields[dbcols[j]]
@@ -406,6 +407,7 @@ func SyncSchema(db *sqlx.DB, table interface{}) error {
 			DropPostgresColumn(db, table, dbcols[j])
 		}
 	}
+
 	return nil
 }
 
