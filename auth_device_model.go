@@ -8,6 +8,7 @@ type Device struct {
 	Version  string `json:"version" hermes:"editable"`
 	Ip       string `json:"ip"`
 	CM_Id    string `json:"cm_id" hermes:"editable"`
+	App_Version	float32 `json:"-" hermes:"index,searchable"`
 }
 
 var DeviceColl *Collection

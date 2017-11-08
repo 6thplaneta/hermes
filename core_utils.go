@@ -9,12 +9,13 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"os/signal"
+	//"os/signal"
 	"strconv"
 	"strings"
-	"syscall"
+	//"syscall"
 	"time"
 )
+
 
 func TrimSuffix(s, suffix string) string {
 	if strings.HasSuffix(s, suffix) {
@@ -30,16 +31,16 @@ func TrimSuffix(s, suffix string) string {
 * @return	bool 			determines if value exists or not.
  */
 
-func ListenForKill(f func()) {
-	osSignal := make(chan os.Signal, 1)
-	signal.Notify(osSignal, syscall.SIGPWR, syscall.SIGABRT, syscall.SIGQUIT, syscall.SIGSTOP, syscall.SIGKILL,
-		syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		<-osSignal
-		f()
-		os.Exit(0)
-	}()
-}
+//func ListenForKill(f func()) {
+//	osSignal := make(chan os.Signal, 1)
+//	signal.Notify(osSignal, syscall.SIGPWR, syscall.SIGABRT, syscall.SIGQUIT, syscall.SIGSTOP, syscall.SIGKILL,
+//		syscall.SIGINT, syscall.SIGTERM)
+//	go func() {
+//		<-osSignal
+//		f()
+//		os.Exit(0)
+//	}()
+//}
 
 func strInArr(st string, arr []string) bool {
 	for _, s := range arr {
