@@ -2,20 +2,20 @@ package hermes
 
 import (
 	//
-	"github.com/gin-gonic/gin"
-	_ "github.com/lib/pq"
-	"github.com/satori/go.uuid"
-	"github.com/spf13/viper"
-	"net/http"
+
 	"os"
+	"net/http"
 	"os/signal"
+	_ "github.com/lib/pq"
+	"github.com/spf13/viper"
+	"github.com/6thplaneta/u"
+	"github.com/gin-gonic/gin"
+	"github.com/satori/go.uuid"
 )
 
-var SystemToken string
+var SystemToken = uuid.NewV4().String()
 
 func init() {
-	//with systemtoken, the user would have access to all actions in system
-	SystemToken = uuid.NewV4().String()
 	InitMessages()
 }
 
@@ -23,16 +23,13 @@ type App struct {
 	Router  *gin.Engine
 	Conf    *viper.Viper
 	DataSrc *DataSrc
-	Logger  *Logger
+	Logger  *u.Logger
 	Modules []Moduler
 }
 
 func (app *App) config(path string) {
-	//read the config of application
 	app.Conf.SetConfigFile(path)
-
 	err := app.Conf.ReadInConfig()
-	//confing file is necessary
 	if err != nil {
 		panic(Messages["NotFoundConfig"])
 	}
@@ -41,7 +38,6 @@ func (app *App) config(path string) {
 func NewApp(configPath string) *App {
 	app := &App{}
 	app.Router = gin.Default()
-	//set app config
 	app.Conf = viper.New()
 	app.config(configPath)
 	app.Modules = make([]Moduler, 0)
@@ -70,8 +66,10 @@ func (app *App) Meta(c *gin.Context) {
 }
 
 func (app *App) InitLogs(path string) {
-	app.Logger = &Logger{}
-	app.Logger.InitLogs(path)
+	var err error
+	if app.Logger, err = u.NewLogger(path, 10000, u.Tehran, nil); err != nil {
+		panic(err)
+	}
 }
 
 func (app *App) uninitDB() {
@@ -83,10 +81,10 @@ func (app *App) killTraper() {
 	signal.Notify(sigchan, os.Kill)
 	<-sigchan
 	app.uninitDB()
-	if app.Logger != nil {
-		app.Logger.UninitLogs()
-
-	}
+	//if app.Logger != nil {
+	//	app.Logger.UninitLogs()
+	//
+	//}
 
 	// do last actions and wait for all write operations to end
 
@@ -108,7 +106,6 @@ func (app *App) GetSettings(name string) Settings {
 
 }
 
-//add a new module to app modules
 func (app *App) Mount(mg Moduler, mountbase string) {
 	app.Modules = append(app.Modules, mg)
 	mg.SetMountPath(mountbase)
@@ -123,21 +120,14 @@ func (app *App) Mount(mg Moduler, mountbase string) {
 }
 
 func (app *App) Run() {
-
 	binding := app.Conf.GetString("app.bind-address")
 	app.Router.Use(CORSMiddleware())
-
 	app.Router.Run(binding)
-	// http.ListenAndServe(binding, app.Router)
 
 }
 
 func (app *App) RunTLS(certFile, keyFile string) {
-
 	binding := app.Conf.GetString("app.bind-address")
 	app.Router.Use(CORSMiddleware())
-
 	app.Router.RunTLS(binding, certFile, keyFile)
-	// http.ListenAndServe(binding, app.Router)
-
 }

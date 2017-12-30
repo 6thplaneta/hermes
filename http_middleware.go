@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
+	"github.com/6thplaneta/u"
 )
 
 func CORSMiddleware() gin.HandlerFunc {
@@ -13,12 +14,10 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Location, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, Cache-Control, X-Requested-With, X-Forwarded-For")
 		c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Type, Location, Authorization, accept, Cache-Control")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
-
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
 			return
 		}
-
 		c.Next()
 	}
 }
@@ -74,22 +73,18 @@ func RateLimitMiddleware(rl *RateLimiter) gin.HandlerFunc {
 	}
 }
 
-func LoggerMiddleware(logger *Logger, excludes []string) gin.HandlerFunc {
+func LoggerMiddleware(logger *u.Logger, excludes []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-
 		for i := 0; i < len(excludes); i++ {
 			var str string
 			str = excludes[i]
-
 			strs := strings.Split(str, ":")
 			if c.Request.Method == strs[0] && strings.Contains(c.Request.URL.Path, strs[1]) {
 				c.Next()
 				return
 			}
 		}
-
-		logger.LogHttp(c)
+		//logger.LogHttp(c)
 		c.Next()
-
 	}
 }

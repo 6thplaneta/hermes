@@ -4,10 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
+	"github.com/6thplaneta/u"
 )
 
 //This function gets error key and returns appropriate message regarding to this key
-func HandleHttpError(c *gin.Context, err error, logger *Logger) {
+func HandleHttpError(c *gin.Context, err error, logger *u.Logger) {
 	var txt string
 	// txt := "HTTP Request, Method: " + c.Request.Method + " IP: " + c.ClientIP() + " Path:" + c.Request.RequestURI
 	serverName, serverIp, err1 := HostInfo()
@@ -16,16 +17,16 @@ func HandleHttpError(c *gin.Context, err error, logger *Logger) {
 	}
 	txt += c.Request.RequestURI + " " + c.Request.Method + " " + c.ClientIP()
 
-	if logger.Level >= 5 {
-		token := c.Request.Header.Get("Authorization")
-		if token == "" {
-			txt = txt + "empty "
-
-		} else {
-			txt = txt + token + " "
-		}
-
-	}
+	//if logger.Level >= 5 {
+	//	token := c.Request.Header.Get("Authorization")
+	//	if token == "" {
+	//		txt = txt + "empty "
+	//
+	//	} else {
+	//		txt = txt + token + " "
+	//	}
+	//
+	//}
 
 	if logger != nil {
 		logger.Error(txt + err.Error())
