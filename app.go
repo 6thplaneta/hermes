@@ -35,9 +35,20 @@ func (app *App) config(path string) {
 	}
 }
 
-func NewApp(configPath string) *App {
+//func NewApp(configPath string) *App {
+//	app := &App{}
+//	app.Router = gin.Default()
+//	app.Conf = viper.New()
+//	app.config(configPath)
+//	app.Modules = make([]Moduler, 0)
+//	app.Init()
+//	app.Router.GET("/meta", app.Meta)
+//	return app
+//}
+
+func NewApp(configPath string, router *gin.Engine) *App {
 	app := &App{}
-	app.Router = gin.Default()
+	app.Router = router
 	app.Conf = viper.New()
 	app.config(configPath)
 	app.Modules = make([]Moduler, 0)
