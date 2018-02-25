@@ -36,6 +36,15 @@ func (s *SearchClient) LoopIndex() {
 	}
 }
 
+func newDataSrc(conf *viper.Viper) *DataSrc {
+	datasrc := &DataSrc{}
+	err := datasrc.Init(conf)
+	if err != nil {
+		panic(err)
+	}
+	return datasrc
+}
+
 type DataSrc struct {
 	DB     *sqlx.DB
 	Cache  *CacheClient

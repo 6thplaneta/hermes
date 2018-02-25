@@ -9,6 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func newGinEngine() *gin.Engine {
+	engine := gin.New()
+	engine.Use(ginLogger(), gin.Recovery())
+	return engine
+}
+
 func ginLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if logs.GetLevel() > logs.Trace {
