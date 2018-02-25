@@ -3,14 +3,15 @@ package hermes
 import (
 	//
 
-	"os"
 	"net/http"
+	"os"
 	"os/signal"
-	_ "github.com/lib/pq"
-	"github.com/spf13/viper"
+
 	"github.com/6thplaneta/u"
 	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
 	"github.com/satori/go.uuid"
+	"github.com/spf13/viper"
 )
 
 var SystemToken = uuid.NewV4().String()

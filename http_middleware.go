@@ -1,10 +1,11 @@
 package hermes
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
+
 	"github.com/6thplaneta/u"
+	"github.com/gin-gonic/gin"
 )
 
 func CORSMiddleware() gin.HandlerFunc {

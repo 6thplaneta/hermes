@@ -3,12 +3,13 @@ package hermes
 import (
 	"errors"
 	"fmt"
-	"github.com/jmoiron/sqlx"
 	"reflect"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 )
 
 func ChangeGoTypeToPostgres(typeOfField, dbtype string) string {

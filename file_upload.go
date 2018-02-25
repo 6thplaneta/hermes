@@ -2,14 +2,15 @@ package hermes
 
 import (
 	// "errors"
-	"github.com/gin-gonic/gin"
-	"github.com/satori/go.uuid"
 	"io"
 	"os"
 	"path"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/satori/go.uuid"
 )
 
 /**

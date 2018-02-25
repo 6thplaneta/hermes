@@ -3,6 +3,7 @@ package hermes
 import (
 	"errors"
 	"fmt"
+
 	"github.com/coocood/freecache"
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"

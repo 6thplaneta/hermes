@@ -1,12 +1,13 @@
 package hermes
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ControllerInfo struct {

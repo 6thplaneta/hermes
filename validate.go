@@ -2,8 +2,9 @@ package hermes
 
 import (
 	"bytes"
-	"gopkg.in/bluesuncorp/validator.v6"
 	"strings"
+
+	"gopkg.in/bluesuncorp/validator.v6"
 )
 
 //checks validation rules on a field

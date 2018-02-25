@@ -2,10 +2,11 @@ package hermes
 
 import (
 	"fmt"
-	"github.com/satori/go.uuid"
 	"math/rand"
 	"strconv"
 	"time"
+
+	"github.com/satori/go.uuid"
 )
 
 type AgentToken struct {

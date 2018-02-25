@@ -3,11 +3,12 @@ package hermes
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Http_Controller_Start(t *testing.T) {

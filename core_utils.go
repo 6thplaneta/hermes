@@ -4,18 +4,18 @@ import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
-	"github.com/antonholmquist/jason"
 	"math/rand"
 	"net"
 	"net/http"
 	"os"
+
+	"github.com/antonholmquist/jason"
 	//"os/signal"
 	"strconv"
 	"strings"
 	//"syscall"
 	"time"
 )
-
 
 func TrimSuffix(s, suffix string) string {
 	if strings.HasSuffix(s, suffix) {

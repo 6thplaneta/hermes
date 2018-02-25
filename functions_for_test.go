@@ -2,11 +2,12 @@ package hermes
 
 import (
 	// "fmt"
-	"github.com/jmoiron/sqlx"
-	"os"
+
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 )
 
 var instance *DataSrc
@@ -227,19 +228,19 @@ func TestMain(m *testing.M) {
 	// FillJsonMap(person)
 
 	//start
-	application = NewApp("conf.yml")
-	application.InitLogs("")
-	application.Mount(AuthorizationModule, "/auth")
+	// application = NewApp("conf.yml")
+	// application.InitLogs("")
+	// application.Mount(AuthorizationModule, "/auth")
 
-	InitMessages()
-	StructsMap["Student_Class"] = Student_Class{}
-	// dbInstance = DBTest().DB
-	DBTest().Cache = &CacheClient{}
-	addTempCollections()
+	// InitMessages()
+	// StructsMap["Student_Class"] = Student_Class{}
+	// // dbInstance = DBTest().DB
+	// DBTest().Cache = &CacheClient{}
+	// addTempCollections()
 
-	retCode := m.Run()
+	// retCode := m.Run()
 
-	//end
-	os.Exit(retCode)
+	// //end
+	// os.Exit(retCode)
 
 }

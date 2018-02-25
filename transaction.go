@@ -1,7 +1,5 @@
 package hermes
 
-import ()
-
 func CreateTrans(token string, col Collectionist, obj interface{}) (interface{}, error) {
 	db := col.GetDataSrc().DB
 	trans, _ := db.Begin()

@@ -1,10 +1,11 @@
 package hermes
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
+
 	"github.com/6thplaneta/u"
+	"github.com/gin-gonic/gin"
 )
 
 //This function gets error key and returns appropriate message regarding to this key
