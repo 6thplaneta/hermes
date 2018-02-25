@@ -1,0 +1,102 @@
+public:
+  gcm_api_key: "key=AAAAPQNH9KY:APA91bGCyezPk-N66tcSHLfvtu9xlPjKPo_ZsSOLSxNMsoGOExak1gQnCSIZLiHGhlRCT5AE1pwiNW0HHT0j_TjvR1p05mJnA-4U7b3Jv3cWmhPqM6K_SPYJ9lUVJQHUCBRmxSNAfqET"
+  upload: "C:/Users/Hossein/WorkSpace/CanDo/upload/"
+  logs: "/home/hossein/logs"
+  html_files: "./_res/static/"
+  mode: "release" #development or release
+  language: "FA" #EN , FA
+  sms_kave: "62656F78336F756451562F714F6C59445233654637773D3D"
+  boost_hours: 2
+  max_boosts: 3
+  path_es_err_cache: "C:/Users/Hossein/WorkSpace/CanDo/es_err_cache/"
+  payment_redirect_url: "http://apipars.candoapp.net/v2/cando/paymentDone"
+  main_adv_price: 50000
+  city_price: 50000
+  city_keyword_price: 50000
+  region_price: 50000
+  region_keyword_price: 65000
+#db:
+#  host: "192.168.2.142"
+#  port: 5432
+#  name: "cando"
+#  user: "postgres"
+#  password: "123456"
+#  engine: "postgres"
+#db:
+#  host: "46.166.169.98"
+#  port: 5432
+#  name: "cando"
+#  user: "postgres"
+#  password: "@khalili2203@"
+#  engine: "postgres"
+db:
+  host: localhost
+  port: 5432
+  name: "app"
+  user: postgres
+  password: s7f4t9
+  engine: postgres
+cassandra:
+  key_space: "cando"
+  cluster: "127.0.0.1"
+  user_name: "cassandra"
+  password: "@mahsa123#@"
+app:
+  bind-address: "0.0.0.0:8181"
+agents:
+  secret: "cando__project__"
+email_provider:
+  sender_email: "info-noreply@candoapp.net"
+  sender_password: "pouya_mahsa"
+  host: "smtp.gmail.com"
+  port: "587"
+cache:
+  use_cache: true
+  engine: "freecache"
+  free_cache:
+    size: 1024
+  redis:
+    addr: "tamandar.com:6379"
+    passwd: ""
+search:
+  engine: "sql"  #sql or elastic
+  elastic:
+    addr: "http://127.0.0.1:9200"
+    index: "cando"
+payment:
+  mid: "10839421"
+  title_increase: "increase"
+  title_decrease: "decrease"
+  title_plan1: "plan1"
+  title_plan2: "plan2"
+  title_plan3: "plan3"
+  plan1_apple:  "com.6thplaneta.plan4"
+  Plan2_apple:  "com.6thplaneta.plan5"
+  plan3_apple:  "com.6thplaneta.plan6"
+  plan1_period: 31
+  plan2_period: 93
+  plan3_period: 186
+  plan1_price: 100000
+  plan2_price: 250000
+  plan3_price: 550000
+  multiple: 50000
+  minimum: 100000
+admin:
+  email:  "support@candoapp.net"
+  password: "pouyamahsa"
+settings:
+  sku: ""
+  version: "1.0.0"
+  main_adv_price: 1000000
+  province_price: 60000
+  province_keyword_price: 20000
+  city_price: 50000
+  city_keyword_price: 10000
+  region_price: 20000
+  region_keyword_price: 10000
+  plan1: 4000
+  plan2: 9000
+  plan3: 20000
+  discount1: 20
+  discount2: 40
+  discount3: 65

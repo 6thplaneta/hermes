@@ -23,7 +23,7 @@ type App struct {
 	Router  *gin.Engine
 	Conf    *viper.Viper
 	DataSrc *DataSrc
-	Logger  *u.Logger
+	Logger  *u.Logger2
 	Modules []Moduler
 }
 
@@ -78,7 +78,7 @@ func (app *App) Meta(c *gin.Context) {
 
 func (app *App) InitLogs(path string) {
 	var err error
-	if app.Logger, err = u.NewLogger(path, 10000, u.Tehran, nil); err != nil {
+	if app.Logger, err = u.NewLogger2(path, 10000, u.Tehran, nil); err != nil {
 		panic(err)
 	}
 }

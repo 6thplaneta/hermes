@@ -8,7 +8,7 @@ import (
 )
 
 //This function gets error key and returns appropriate message regarding to this key
-func HandleHttpError(c *gin.Context, err error, logger *u.Logger) {
+func HandleHttpError(c *gin.Context, err error, logger *u.Logger2) {
 	var txt string
 	// txt := "HTTP Request, Method: " + c.Request.Method + " IP: " + c.ClientIP() + " Path:" + c.Request.RequestURI
 	serverName, serverIp, err1 := HostInfo()

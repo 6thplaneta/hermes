@@ -73,7 +73,7 @@ func RateLimitMiddleware(rl *RateLimiter) gin.HandlerFunc {
 	}
 }
 
-func LoggerMiddleware(logger *u.Logger, excludes []string) gin.HandlerFunc {
+func LoggerMiddleware(logger *u.Logger2, excludes []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		for i := 0; i < len(excludes); i++ {
 			var str string
