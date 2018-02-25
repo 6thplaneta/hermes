@@ -17,7 +17,7 @@ func newGinEngine() *gin.Engine {
 
 func ginLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if logs.GetLevel() > logs.Trace {
+		if logs.GetLevel() > logs.Debug {
 			return
 		}
 
@@ -29,8 +29,14 @@ func ginLogger() gin.HandlerFunc {
 		method := c.Request.Method
 		statusCode := c.Writer.Status()
 
-		// logs.Handle(logs.Trace.NewWithTag("Request", fmt.Sprintf("%3d | %13v | %15s | %-7s | %s",
-		logs.Handle(logs.Trace.NewWithTag("Request", fmt.Sprintf("%3d | %v | %s | %s | %s",
-			statusCode, latency, clientIP, method, path)))
+		if logs.GetLevel() == logs.Trace {
+			// logs.Handle(logs.Trace.NewWithTag("Request", fmt.Sprintf("%3d | %13v | %15s | %-7s | %s",
+			logs.Handle(logs.Trace.NewWithTag("Request", fmt.Sprintf("%3d | %v | %s | %s | %s",
+				statusCode, latency, clientIP, method, path)))
+		} else if statusCode != 200 {
+			// logs.Handle(logs.Trace.NewWithTag("Request", fmt.Sprintf("%3d | %13v | %15s | %-7s | %s",
+			logs.Handle(logs.Debug.NewWithTag("Request", fmt.Sprintf("%3d | %v | %s | %s | %s",
+				statusCode, latency, clientIP, method, path)))
+		}
 	}
 }

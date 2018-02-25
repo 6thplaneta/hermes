@@ -6,7 +6,8 @@ import (
 
 func newViper() *viper.Viper {
 	config := viper.New()
-	config.SetConfigFile("./res/config/general.yml")
+	// config.SetConfigFile(os.Args[1])
+	config.SetConfigFile("./_res/config/hermes.yml")
 	err := config.ReadInConfig()
 	if err != nil {
 		panic(err)

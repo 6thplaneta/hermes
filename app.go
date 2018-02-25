@@ -89,6 +89,8 @@ func (o *App) initLogs() {
 		logs.SetLevel(logs.Debug)
 	case "trace":
 		logs.SetLevel(logs.Trace)
+	default:
+		panic("this level of the log is not supported")
 	}
 	if o.Conf.GetBool("logs.stdout") {
 		logs.Add(os.Stdout)
