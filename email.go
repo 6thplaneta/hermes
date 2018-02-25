@@ -60,7 +60,7 @@ func SendEmail(subject, body, address string, sender map[string]interface{}, htm
 		body + "\r\n")
 	err := smtp.SendMail(host+":"+port, auth, senderEmail, to, msg)
 	if err != nil {
-		application.Logger.Error(err.Error())
+		// application.Logger.Error(err.Error())
 		return err
 
 	}

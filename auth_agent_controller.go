@@ -44,7 +44,7 @@ func (agentCont *AgentController) ChangePassword(c *gin.Context) {
 	//}
 
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		HandleHttpError(c, err)
 		return
 	}
 
@@ -57,7 +57,7 @@ func (agentCont *AgentController) RequestPasswordToken(c *gin.Context) {
 	//
 	_, err := AgentColl.RequestPasswordToken(c.Param("identity"))
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		HandleHttpError(c, err)
 		return
 	}
 
@@ -81,7 +81,7 @@ func (agentCont *AgentController) ChangePasswordByToken(c *gin.Context) {
 	//}
 
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		HandleHttpError(c, err)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (agentCont *AgentController) ActiveUserByToken(c *gin.Context) {
 	//pass the activation token , if it is valid activate the user
 	err := AgentColl.ActiveUserByToken(c.Param("token"))
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		HandleHttpError(c, err)
 		return
 	}
 
@@ -108,7 +108,7 @@ func (agentCont *AgentController) FBLogin(c *gin.Context) {
 	agent.Device.Ip = c.ClientIP()
 	agentToken, err := AgentColl.FBLogin(agent, ftoken)
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		HandleHttpError(c, err)
 		return
 	}
 
@@ -121,7 +121,7 @@ func (agentCont *AgentController) Login(c *gin.Context) {
 	agent.Device.Ip = c.ClientIP()
 	agentToken, err := AgentColl.Login(agent, "")
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		HandleHttpError(c, err)
 		return
 	}
 
@@ -131,7 +131,7 @@ func (agentCont *AgentController) Login(c *gin.Context) {
 func (agentCont *AgentController) Logout(c *gin.Context) {
 
 	if err := AgentTokenColl.Logout(c.Param("token")); err != nil {
-		HandleHttpError(c, err, application.Logger)
+		HandleHttpError(c, err)
 		return
 	}
 

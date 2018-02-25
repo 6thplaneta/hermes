@@ -139,7 +139,7 @@ func (src *DataSrc) InitCache(conf *viper.Viper) error {
 
 func (src *DataSrc) InitSearch(conf *viper.Viper) error {
 	searchEngine := conf.GetString("search.engine")
-	fmt.Println("search engine, (is elastic)?: ", searchEngine, searchEngine == "elastic")
+	// fmt.Println("search engine, (is elastic)?: ", searchEngine, searchEngine == "elastic")
 	src.Search = &SearchClient{Engine: searchEngine}
 	if searchEngine == "elastic" {
 		addr := conf.GetString("search.elastic.addr")

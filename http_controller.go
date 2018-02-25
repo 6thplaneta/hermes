@@ -99,7 +99,7 @@ func (cont *Controller) Report(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	result, err := cont.Coll.Report(token, page, pageSize, params, c.Query("$search"), sortBy, sortOrder, c.Query("$populate"), aggregation)
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		HandleHttpError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, result)
@@ -136,7 +136,7 @@ func (cont *Controller) List(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	pg, err := ReadPaging(c)
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		// HandleHttpError(c, err, application.Logger)
 		return
 	}
 
@@ -144,7 +144,7 @@ func (cont *Controller) List(c *gin.Context) {
 	// result, err := cont.Coll.List(token, params, pg, c.Query("$populate"), "")
 
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		// HandleHttpError(c, err, application.Logger)
 		return
 	}
 	c.JSON(http.StatusOK, result)
@@ -158,7 +158,7 @@ func (cont *Controller) Get(c *gin.Context) {
 	// result, err := cont.Coll.Get(token, id, c.Query("$populate"))
 	result, err := CacheGet(cont.Coll.GetDataSrc(), cont.Coll, token, id, c.Query("$populate"))
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		// HandleHttpError(c, err, application.Logger)
 		return
 	}
 	c.JSON(http.StatusOK, result)
@@ -168,13 +168,13 @@ func (cont *Controller) Get(c *gin.Context) {
 func (cont *Controller) Delete(c *gin.Context) {
 	id, iderr := strconv.Atoi(c.Param("id"))
 	if iderr != nil {
-		nferr := ErrNotFound
-		HandleHttpError(c, nferr, application.Logger)
+		// nferr := ErrNotFound
+		// HandleHttpError(c, nferr, application.Logger)
 		return
 	}
 	token := c.Request.Header.Get("Authorization")
 	if err := cont.Coll.Delete(nil, token, id); err != nil {
-		HandleHttpError(c, err, application.Logger)
+		// HandleHttpError(c, err, application.Logger)
 		return
 	}
 
@@ -187,8 +187,8 @@ func (cont *Controller) Update(c *gin.Context) {
 	obj := inst.Interface()
 	id, iderr := strconv.Atoi(c.Param("id"))
 	if iderr != nil {
-		nferr := ErrNotFound
-		HandleHttpError(c, nferr, application.Logger)
+		// nferr := ErrNotFound
+		// HandleHttpError(c, nferr, application.Logger)
 		return
 	}
 
@@ -196,7 +196,7 @@ func (cont *Controller) Update(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	err := cont.Coll.Update(token, nil, id, obj)
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		// HandleHttpError(c, err, application.Logger)
 		return
 	}
 
@@ -208,13 +208,13 @@ func (cont *Controller) Create(c *gin.Context) {
 	obj := inst.Interface()
 	err := c.BindJSON(obj)
 	if err != nil {
-		HandleHttpError(c, NewError("BadRequest", "Error in parsing body: "+err.Error()), application.Logger)
+		// HandleHttpError(c, NewError("BadRequest", "Error in parsing body: "+err.Error()), application.Logger)
 		return
 	}
 	token := c.Request.Header.Get("Authorization")
 	r, err := CreateTrans(token, cont.Coll, obj)
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		// HandleHttpError(c, err, application.Logger)
 		return
 	}
 	Id := reflect.ValueOf(r).Elem().FieldByName("Id").Int()
@@ -237,7 +237,7 @@ func (cont *Controller) Rel(c *gin.Context) {
 
 	err := cont.Coll.Rel(token, origin_id, field, arrIds)
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		// HandleHttpError(c, err, application.Logger)
 		return
 	}
 	c.JSON(http.StatusOK, Messages["ResourceUpdated"])
@@ -253,7 +253,7 @@ func (cont *Controller) UnRel(c *gin.Context) {
 
 	err := cont.Coll.UnRel(token, origin_id, field, arrIds)
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		// HandleHttpError(c, err, application.Logger)
 		return
 	}
 	c.JSON(http.StatusOK, Messages["ResourceUpdated"])
@@ -269,7 +269,7 @@ func (cont *Controller) UpdateRel(c *gin.Context) {
 
 	err := cont.Coll.UpdateRel(token, origin_id, field, arrIds)
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		// HandleHttpError(c, err, application.Logger)
 		return
 	}
 
@@ -284,7 +284,7 @@ func (cont *Controller) GetRel(c *gin.Context) {
 
 	result, err := cont.Coll.GetRel(token, origin_id, field)
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		// HandleHttpError(c, err, application.Logger)
 		return
 	}
 	c.JSON(http.StatusOK, result)

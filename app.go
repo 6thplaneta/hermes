@@ -1,13 +1,15 @@
 package hermes
 
 import (
+	"time"
+
+	"github.com/6thplaneta/go-server/logs"
 	//
 
 	"net/http"
 	"os"
 	"os/signal"
 
-	"github.com/6thplaneta/u"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/satori/go.uuid"
@@ -24,7 +26,6 @@ type App struct {
 	Router  *gin.Engine
 	Conf    *viper.Viper
 	DataSrc *DataSrc
-	Logger  *u.Logger2
 	Modules []Moduler
 }
 
@@ -36,20 +37,10 @@ func (app *App) config(path string) {
 	}
 }
 
-//func NewApp(configPath string) *App {
-//	app := &App{}
-//	app.Router = gin.Default()
-//	app.Conf = viper.New()
-//	app.config(configPath)
-//	app.Modules = make([]Moduler, 0)
-//	app.Init()
-//	app.Router.GET("/meta", app.Meta)
-//	return app
-//}
-
-func NewApp(configPath string, router *gin.Engine) *App {
+func NewApp(configPath string) *App {
 	app := &App{}
-	app.Router = router
+	app.Router = gin.New()
+	app.Router.Use(ginLogger(), gin.Recovery())
 	app.Conf = viper.New()
 	app.config(configPath)
 	app.Modules = make([]Moduler, 0)
@@ -65,6 +56,7 @@ func (app *App) Init() {
 		panic(err)
 	}
 	app.DataSrc = datasrc
+	app.initLogs()
 	go app.killTraper()
 }
 
@@ -77,11 +69,37 @@ func (app *App) Meta(c *gin.Context) {
 	c.JSON(http.StatusOK, mgs)
 }
 
-func (app *App) InitLogs(path string) {
-	var err error
-	if app.Logger, err = u.NewLogger2(path, 10000, u.Tehran, nil); err != nil {
-		panic(err)
+func (app *App) initLogs() {
+	var path interface{}
+	path = app.Conf.GetStringMap("logs")["path"]
+	if path != nil {
+		logs.SetDir(path.(string))
 	}
+	level := app.Conf.GetStringMap("logs")["level"].(string)
+	switch level {
+	case "off":
+		logs.SetLevel(logs.Off)
+	case "fatal":
+		logs.SetLevel(logs.Fatal)
+	case "error":
+		logs.SetLevel(logs.Error)
+	case "warning":
+		logs.SetLevel(logs.Warning)
+	case "info":
+		logs.SetLevel(logs.Info)
+	case "debug":
+		logs.SetLevel(logs.Debug)
+	case "trace":
+		logs.SetLevel(logs.Trace)
+	}
+	if app.Conf.GetStringMap("logs")["stdout"].(bool) {
+		logs.Add(os.Stdout)
+	}
+	loc, err := time.LoadLocation(app.Conf.GetStringMap("logs")["location"].(string))
+	if err != nil {
+		panic(err.Error())
+	}
+	logs.SetLocation(loc)
 }
 
 func (app *App) uninitDB() {
@@ -132,14 +150,8 @@ func (app *App) Mount(mg Moduler, mountbase string) {
 }
 
 func (app *App) Run() {
-	binding := app.Conf.GetString("app.bind-address")
+	binding := app.Conf.GetString("router.bind-address")
 	app.Router.Use(CORSMiddleware())
 	app.Router.Run(binding)
 
-}
-
-func (app *App) RunTLS(certFile, keyFile string) {
-	binding := app.Conf.GetString("app.bind-address")
-	app.Router.Use(CORSMiddleware())
-	app.Router.RunTLS(binding, certFile, keyFile)
 }

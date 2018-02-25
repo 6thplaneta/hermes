@@ -493,7 +493,7 @@ func (col *AgentCollection) Login(agent Agent, url string) (AgentToken, error) {
 	_, err1 := col.DataSrc.DB.Exec(strQ)
 
 	if err1 != nil {
-		application.Logger.Error(err1.Error())
+		// application.Logger.Error(err1.Error())
 	}
 	var rdevice *Device
 
