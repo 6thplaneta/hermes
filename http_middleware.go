@@ -2,9 +2,7 @@ package hermes
 
 import (
 	"net/http"
-	"strings"
 
-	"github.com/6thplaneta/u"
 	"github.com/gin-gonic/gin"
 )
 
@@ -74,18 +72,18 @@ func RateLimitMiddleware(rl *RateLimiter) gin.HandlerFunc {
 	}
 }
 
-func LoggerMiddleware(logger *u.Logger2, excludes []string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		for i := 0; i < len(excludes); i++ {
-			var str string
-			str = excludes[i]
-			strs := strings.Split(str, ":")
-			if c.Request.Method == strs[0] && strings.Contains(c.Request.URL.Path, strs[1]) {
-				c.Next()
-				return
-			}
-		}
-		//logger.LogHttp(c)
-		c.Next()
-	}
-}
+// func LoggerMiddleware(logger *u.Logger2, excludes []string) gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		for i := 0; i < len(excludes); i++ {
+// 			var str string
+// 			str = excludes[i]
+// 			strs := strings.Split(str, ":")
+// 			if c.Request.Method == strs[0] && strings.Contains(c.Request.URL.Path, strs[1]) {
+// 				c.Next()
+// 				return
+// 			}
+// 		}
+// 		//logger.LogHttp(c)
+// 		c.Next()
+// 	}
+// }
