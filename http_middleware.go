@@ -28,7 +28,7 @@ func UploadMiddleware(inputName, savePath string, fn func(string, string) (inter
 	return func(c *gin.Context) {
 		url, err := Upload(c, inputName, savePath)
 		if err != nil {
-			// HandleHttpError(c, err, application.Logger)
+			HandleHttpError(c, err)
 			return
 		}
 
@@ -37,14 +37,14 @@ func UploadMiddleware(inputName, savePath string, fn func(string, string) (inter
 		r.ParseMultipartForm(32 << 20)
 		file, handler, err := r.FormFile(inputName)
 		if err != nil {
-			// HandleHttpError(c, err, application.Logger)
+			HandleHttpError(c, err)
 			return
 		}
 		defer file.Close()
 		if fn != nil {
 			out, errFN := fn(url, handler.Header.Get("Content-Type"))
 			if errFN != nil {
-				// HandleHttpError(c, errFN, application.Logger)
+				HandleHttpError(c, errFN)
 			} else {
 				c.JSON(http.StatusOK, out)
 			}
@@ -66,7 +66,7 @@ func RateLimitMiddleware(rl *RateLimiter) gin.HandlerFunc {
 		pass := rl.Check(ip)
 
 		if !pass {
-			// HandleHttpError(c, ErrRateExceed, application.Logger)
+			HandleHttpError(c, ErrRateExceed)
 		} else {
 			c.Next()
 		}
