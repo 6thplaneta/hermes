@@ -41,7 +41,7 @@ func ginLogger() gin.HandlerFunc {
 			data = fmt.Sprintf("<Headers>%s", headers.String())
 		}
 
-		if c.Request.Header.Get("Content-Type") == "application/json" {
+		if logs.GetLevel() == logs.Trace && c.Request.Header.Get("Content-Type") == "application/json" {
 			raw, err := c.GetRawData()
 			if err != nil {
 				println(err.Error())
