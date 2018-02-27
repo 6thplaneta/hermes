@@ -1,10 +1,12 @@
 package hermes
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/6thplaneta/go-server/logs"
+	"github.com/6thplaneta/go-server/utypes"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,9 +20,13 @@ func HandleHttpError(c *gin.Context, err error) {
 		txt = serverName + " " + serverIp + " "
 	}
 	txt += c.Request.RequestURI + " " + c.Request.Method + " " + c.ClientIP()
-	if logs.GetLevel() >= logs.Debug {
-		logs.Handle(logs.Trace.NewWithTag("Request", txt+err.Error()))
-	}
+
+	l := &logs.Log{Tag: utypes.String("Hermes")}
+	l.Description = fmt.Sprintf("%s [%s  %s  %d  %s]", err.Error(), c.Request.Method, c.Request.URL.Path,
+		500, c.ClientIP())
+
+	logs.HandleSkip(l, 1)
+
 	//if logger.Level >= 5 {
 	//	token := c.Request.Header.Get("Authorization")
 	//	if token == "" {

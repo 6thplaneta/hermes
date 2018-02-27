@@ -67,7 +67,6 @@ func (o *App) Run() {
 	binding := o.Conf.GetString("router.bind-address")
 	o.Router.Use(CORSMiddleware())
 	o.Router.Run(binding)
-
 }
 
 // utils
