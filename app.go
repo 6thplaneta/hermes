@@ -2,6 +2,8 @@ package hermes
 
 import (
 	"net/http"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"os"
@@ -29,8 +31,9 @@ type App struct {
 	Router  *gin.Engine
 	Conf    *viper.Viper
 
-	modules  []Moduler
-	metaInfo []ModuleInfo
+	modules   []Moduler
+	metaInfo  []ModuleInfo
+	listeners []Listener
 }
 
 // GetSettings ...
@@ -46,6 +49,11 @@ func (o *App) GetSettings(name string) Settings {
 		}
 	}
 	return settings
+}
+
+//
+func (o *App) AddListener(listener Listener) {
+	o.listeners = append(o.listeners, listener)
 }
 
 // Mount ...
@@ -66,7 +74,8 @@ func (o *App) Mount(mg Moduler, mountbase string) {
 func (o *App) Run() {
 	binding := o.Conf.GetString("router.bind-address")
 	o.Router.Use(CORSMiddleware())
-	o.Router.Run(binding)
+	go o.Router.Run(binding)
+	o.listenForTerminate()
 }
 
 // utils
@@ -111,4 +120,18 @@ func (o *App) meta(c *gin.Context) {
 		}
 	}
 	c.JSON(http.StatusOK, o.metaInfo)
+}
+
+//
+func (o *App) listenForTerminate() {
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGHUP, syscall.SIGKILL, syscall.SIGTERM,
+		syscall.SIGQUIT, syscall.SIGABRT, syscall.SIGSTOP, syscall.SIGPWR)
+	sig := <-signals
+	for _, l := range o.listeners {
+		l.OnTerminate(sig)
+	}
+	if sig != nil {
+		logs.Handle(logs.Off.New(sig.String()))
+	}
 }

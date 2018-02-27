@@ -1,6 +1,7 @@
 package hermes
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 	"time"
@@ -23,33 +24,44 @@ func ginLogger() gin.HandlerFunc {
 		}
 
 		start := time.Now()
-		path := c.Request.URL.Path
+		path := c.Request.URL.RequestURI()
 		c.Next()
 		latency := time.Now().Sub(start)
 		clientIP := c.ClientIP()
 		method := c.Request.Method
 		statusCode := c.Writer.Status()
-		if logs.GetLevel() == logs.Trace {
-			if c.Request.Header.Get("Content-Type") == "application/json" {
-				raw, err := c.GetRawData()
-				if err != nil {
-					println(err.Error())
-					return
-				}
-				body := string(raw)
-				body = strings.Replace(body, "\n", "", -1)
-				body = strings.Replace(body, "\t", "", -1)
-				logs.Handle(logs.Trace.NewWithTag("Middle", fmt.Sprintf("%3d | %v | %s | %s | %s\r\n%s",
-					statusCode, latency, clientIP, method, path, string(body))))
-			} else {
-				logs.Handle(logs.Trace.NewWithTag("Middle", fmt.Sprintf("%3d | %v | %s | %s | %s",
-					statusCode, latency, clientIP, method, path)))
-			}
 
-			// logs.Handle(logs.Trace.NewWithTag("Request", fmt.Sprintf("%3d | %13v | %15s | %-7s | %s",
+		headers := bytes.NewBufferString("")
+		for key, value := range c.Request.Header {
+			headers.WriteString(fmt.Sprintf("\r\n[%s: %s]", key, strings.Join(value, " | ")))
+		}
+
+		var data string
+		if headers.Len() != 0 {
+			data = fmt.Sprintf("<Headers>%s", headers.String())
+		}
+
+		if c.Request.Header.Get("Content-Type") == "application/json" {
+			raw, err := c.GetRawData()
+			if err != nil {
+				println(err.Error())
+				return
+			}
+			body := string(raw)
+			body = strings.Replace(body, "\n", "", -1)
+			body = strings.Replace(body, "\t", "", -1)
+			if data != "" {
+				data += "\r\n<Body>\r\n" + body
+			} else {
+				data = "<Body>\r\n" + body
+			}
+		}
+
+		if logs.GetLevel() == logs.Trace && data != "" {
+			logs.Handle(logs.GetLevel().NewWithTag("Request", fmt.Sprintf("%3d | %v | %s | %s | %s\r\n%s",
+				statusCode, latency, clientIP, method, path, data)))
 		} else {
-			// logs.Handle(logs.Trace.NewWithTag("Request", fmt.Sprintf("%3d | %13v | %15s | %-7s | %s",
-			logs.Handle(logs.Debug.NewWithTag("Middle", fmt.Sprintf("%3d | %v | %s | %s | %s",
+			logs.Handle(logs.GetLevel().NewWithTag("Request", fmt.Sprintf("%3d | %v | %s | %s | %s",
 				statusCode, latency, clientIP, method, path)))
 		}
 	}
