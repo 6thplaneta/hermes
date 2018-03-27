@@ -3,6 +3,7 @@ package hermes
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"strings"
 	"time"
 
@@ -13,7 +14,7 @@ import (
 
 func newGinEngine() *gin.Engine {
 	engine := gin.New()
-	engine.Use(ginLogger(), gin.Recovery())
+	engine.Use(gin.Recovery(), ginLogger())
 	return engine
 }
 
@@ -23,13 +24,10 @@ func ginLogger() gin.HandlerFunc {
 			return
 		}
 
-		start := time.Now()
 		path := c.Request.URL.RequestURI()
-		c.Next()
-		latency := time.Now().Sub(start)
+
 		clientIP := c.ClientIP()
 		method := c.Request.Method
-		statusCode := c.Writer.Status()
 
 		headers := bytes.NewBufferString("")
 		for key, value := range c.Request.Header {
@@ -42,11 +40,12 @@ func ginLogger() gin.HandlerFunc {
 		}
 
 		if logs.GetLevel() == logs.Trace && c.Request.Header.Get("Content-Type") == "application/json" {
-			raw, err := c.GetRawData()
+			raw, err := ioutil.ReadAll(c.Request.Body)
 			if err != nil {
 				println(err.Error())
 				return
 			}
+			c.Request.Body = &closingBuffer{bytes.NewReader(raw)}
 			body := string(raw)
 			body = strings.Replace(body, "\n", "", -1)
 			body = strings.Replace(body, "\t", "", -1)
@@ -57,6 +56,11 @@ func ginLogger() gin.HandlerFunc {
 			}
 		}
 
+		start := time.Now()
+		c.Next()
+		latency := time.Now().Sub(start)
+		statusCode := c.Writer.Status()
+
 		if logs.GetLevel() == logs.Trace && data != "" {
 			logs.Handle(logs.GetLevel().NewWithTag("Request", fmt.Sprintf("%3d | %v | %s | %s | %s\r\n%s",
 				statusCode, latency, clientIP, method, path, data)))
@@ -65,4 +69,12 @@ func ginLogger() gin.HandlerFunc {
 				statusCode, latency, clientIP, method, path)))
 		}
 	}
+}
+
+type closingBuffer struct {
+	*bytes.Reader
+}
+
+func (cb *closingBuffer) Close() error {
+	return nil
 }

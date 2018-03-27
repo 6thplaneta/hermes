@@ -70,6 +70,11 @@ func (o *App) Mount(mg Moduler, mountbase string) {
 
 }
 
+//
+func (o *App) IsMaster() bool {
+	return o.Conf.GetBool("is_master")
+}
+
 // Run ...
 func (o *App) Run() {
 	binding := o.Conf.GetString("router.bind-address")

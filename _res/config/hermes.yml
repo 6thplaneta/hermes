@@ -10,6 +10,7 @@ db:
   name: "app"
   user: postgres
   password: s7f4t9
+is_master: true
 router:
   bind-address: "localhost:8181"
 agents:
