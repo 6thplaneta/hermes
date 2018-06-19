@@ -86,34 +86,36 @@ func (o *App) Run() {
 // utils
 
 func (o *App) initLogs() {
+	logger := logs.NewSimpleLogger()
 	level := o.Conf.GetString("logs.level")
 	switch level {
 	case "off":
-		logs.SetLevel(logs.Off)
+		logger.SetLevel(logs.Off)
 	case "fatal":
-		logs.SetLevel(logs.Fatal)
+		logger.SetLevel(logs.Fatal)
 	case "error":
-		logs.SetLevel(logs.Error)
+		logger.SetLevel(logs.Error)
 	case "warning":
-		logs.SetLevel(logs.Warning)
+		logger.SetLevel(logs.Warning)
 	case "info":
-		logs.SetLevel(logs.Info)
+		logger.SetLevel(logs.Info)
 	case "debug":
-		logs.SetLevel(logs.Debug)
+		logger.SetLevel(logs.Debug)
 	case "trace":
-		logs.SetLevel(logs.Trace)
+		logger.SetLevel(logs.Trace)
 	default:
 		panic("this level of the log is not supported")
 	}
 	if o.Conf.GetBool("logs.stdout") {
-		logs.Add(os.Stdout)
+		logger.Add(os.Stdout)
 	}
-	logs.SetDir(o.Conf.GetString("logs.path"))
+	logger.SetDir(o.Conf.GetString("logs.path"))
 	loc, err := time.LoadLocation(o.Conf.GetString("logs.location"))
 	if err != nil {
 		panic(err.Error())
 	}
-	logs.SetLocation(loc)
+	logger.SetLocation(loc)
+	logs.SetInstance(logger)
 }
 
 // handlers
@@ -137,6 +139,6 @@ func (o *App) listenForTerminate() {
 		l.OnTerminate(sig)
 	}
 	if sig != nil {
-		logs.Handle(logs.Off.New(sig.String()))
+		logs.Instance().Handle(logs.Off.New(sig.String()))
 	}
 }

@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/6thplaneta/go-server/logs"
-	"github.com/6thplaneta/go-server/utypes"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,11 +20,11 @@ func HandleHttpError(c *gin.Context, err error) {
 	}
 	txt += c.Request.RequestURI + " " + c.Request.Method + " " + c.ClientIP()
 
-	l := &logs.Log{Tag: utypes.String("Hermes")}
+	l := &logs.Log{Tag: logs.NewTag("Hermes")}
 	l.Description = fmt.Sprintf("%s [%s  %s  %d  %s]", err.Error(), c.Request.Method, c.Request.URL.Path,
 		500, c.ClientIP())
 
-	logs.HandleSkip(l, 1)
+	logs.Instance().HandleSkip(1, l)
 
 	//if logger.Level >= 5 {
 	//	token := c.Request.Header.Get("Authorization")

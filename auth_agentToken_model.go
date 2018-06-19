@@ -101,7 +101,7 @@ func NewToken(agentid int, tokenType string) AgentToken {
 		agentToken.Token = random(10000, 99999)
 	} else {
 		//login token is a uuid string
-		u1 := uuid.NewV4()
+		u1, _ := uuid.NewV4()
 		agentToken.Token = u1.String()
 	}
 	return agentToken

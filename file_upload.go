@@ -25,7 +25,8 @@ import (
  */
 func Upload(c *gin.Context, inputName, savePath string) (string, error) {
 	//generate unique filename
-	uniquefid := uuid.NewV4().String()
+	uui, _ := uuid.NewV4()
+	uniquefid := uui.String()
 	r := c.Request
 	r.ParseMultipartForm(32 << 20)
 	//get file content
