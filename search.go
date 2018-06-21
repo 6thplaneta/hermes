@@ -2,9 +2,10 @@ package hermes
 
 import (
 	"encoding/json"
-	"gopkg.in/olivere/elastic.v3"
 	"reflect"
 	"strconv"
+
+	"gopkg.in/olivere/elastic.v3"
 )
 
 func GenerateSearchSQL(searchInstance *SearchClient, instance interface{}, search, baseTable string) (string, error) {

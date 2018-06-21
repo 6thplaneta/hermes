@@ -3,12 +3,13 @@ package hermes
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/gin-gonic/gin"
-	"github.com/satori/go.uuid"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/gin-gonic/gin"
+	"github.com/satori/go.uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 var pass_token string

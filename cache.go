@@ -5,12 +5,13 @@ import (
 	"crypto/sha1"
 	"encoding/binary"
 	"fmt"
-	"github.com/coocood/freecache"
-	"gopkg.in/redis.v4"
-	"gopkg.in/vmihailenco/msgpack.v2"
 	"reflect"
 	"strconv"
 	"time"
+
+	"github.com/coocood/freecache"
+	"gopkg.in/redis.v4"
+	"gopkg.in/vmihailenco/msgpack.v2"
 )
 
 func CacheList(dsrc *DataSrc, coll Collectionist, token string, params *Params, pg *Paging, populate, project string) (interface{}, error) {

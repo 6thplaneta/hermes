@@ -1,143 +1,144 @@
 package hermes
 
 import (
-	//
-	"github.com/gin-gonic/gin"
-	_ "github.com/lib/pq"
-	"github.com/satori/go.uuid"
-	"github.com/spf13/viper"
 	"net/http"
-	"os"
 	"os/signal"
+	"syscall"
+	"time"
+
+	"os"
+
+	"github.com/6thplaneta/go-server/logs"
+	"github.com/gin-gonic/gin"
+
+	"github.com/spf13/viper"
 )
 
-var SystemToken string
-
-func init() {
-	//with systemtoken, the user would have access to all actions in system
-	SystemToken = uuid.NewV4().String()
-	InitMessages()
-}
-
-type App struct {
-	Router  *gin.Engine
-	Conf    *viper.Viper
-	DataSrc *DataSrc
-	Logger  *Logger
-	Modules []Moduler
-}
-
-func (app *App) config(path string) {
-	//read the config of application
-	app.Conf.SetConfigFile(path)
-
-	err := app.Conf.ReadInConfig()
-	//confing file is necessary
-	if err != nil {
-		panic(Messages["NotFoundConfig"])
-	}
-}
-
-func NewApp(configPath string) *App {
+// NewApp ...
+func NewApp() *App {
 	app := &App{}
-	app.Router = gin.Default()
-	//set app config
-	app.Conf = viper.New()
-	app.config(configPath)
-	app.Modules = make([]Moduler, 0)
-	app.Init()
-	app.Router.GET("/meta", app.Meta)
+	app.Conf = newViper()
+	app.Router = newGinEngine()
+	app.DataSrc = newDataSrc(app.Conf)
+	app.Router.GET("/meta", app.meta)
+	app.initLogs()
 	return app
 }
 
-func (app *App) Init() {
-	datasrc := &DataSrc{}
-	err := datasrc.Init(app.Conf)
-	if err != nil {
-		panic(err)
-	}
-	app.DataSrc = datasrc
-	go app.killTraper()
+// App ...
+type App struct {
+	DataSrc *DataSrc
+	Router  *gin.Engine
+	Conf    *viper.Viper
+
+	modules   []Moduler
+	metaInfo  []ModuleInfo
+	listeners []Listener
 }
 
-func (app *App) Meta(c *gin.Context) {
-	mgs := make([]ModuleInfo, len(app.Modules))
-	for i, mg := range app.Modules {
-		mi := ModuleInfo{mg.GetName(), mg.GetPath(), "Module"}
-		mgs[i] = mi
-	}
-	c.JSON(http.StatusOK, mgs)
-}
-
-func (app *App) InitLogs(path string) {
-	app.Logger = &Logger{}
-	app.Logger.InitLogs(path)
-}
-
-func (app *App) uninitDB() {
-}
-
-func (app *App) killTraper() {
-	sigchan := make(chan os.Signal, 10)
-	signal.Notify(sigchan, os.Interrupt)
-	signal.Notify(sigchan, os.Kill)
-	<-sigchan
-	app.uninitDB()
-	if app.Logger != nil {
-		app.Logger.UninitLogs()
-
-	}
-
-	// do last actions and wait for all write operations to end
-
-	os.Exit(0)
-}
-
-//
-func (app *App) GetSettings(name string) Settings {
-	settings := app.Conf.GetStringMap(name)
+// GetSettings ...
+// Deprecated
+func (o *App) GetSettings(name string) Settings {
+	settings := o.Conf.GetStringMap(name)
 	if settings == nil {
-		return Settings{}
+		settings = Settings{}
 	} else {
-		pubs := app.Conf.GetStringMap("public")
+		pubs := o.Conf.GetStringMap("public")
 		for k, v := range pubs {
 			settings[k] = v
 		}
-		return settings
 	}
-
+	return settings
 }
 
-//add a new module to app modules
-func (app *App) Mount(mg Moduler, mountbase string) {
-	app.Modules = append(app.Modules, mg)
+//
+func (o *App) AddListener(listener Listener) {
+	o.listeners = append(o.listeners, listener)
+}
+
+// Mount ...
+func (o *App) Mount(mg Moduler, mountbase string) {
+	o.modules = append(o.modules, mg)
 	mg.SetMountPath(mountbase)
-	mg.SetApp(app)
-	mg.SetDataSrc(app.DataSrc)
-	err := mg.Init(app)
+	mg.SetApp(o)
+	mg.SetDataSrc(o.DataSrc)
+	err := mg.Init(o)
 	if err != nil {
 		panic("mount error at: " + mountbase + " error message is: " + err.Error())
 	}
-	app.Router.GET(mountbase+"/meta", mg.Meta)
+	o.Router.GET(mountbase+"/meta", mg.Meta)
 
 }
 
-func (app *App) Run() {
-
-	binding := app.Conf.GetString("app.bind-address")
-	app.Router.Use(CORSMiddleware())
-
-	app.Router.Run(binding)
-	// http.ListenAndServe(binding, app.Router)
-
+//
+func (o *App) IsMaster() bool {
+	return o.Conf.GetBool("is_master")
 }
 
-func (app *App) RunTLS(certFile, keyFile string) {
+// Run ...
+func (o *App) Run() {
+	binding := o.Conf.GetString("router.bind-address")
+	o.Router.Use(CORSMiddleware())
+	go o.Router.Run(binding)
+	o.listenForTerminate()
+}
 
-	binding := app.Conf.GetString("app.bind-address")
-	app.Router.Use(CORSMiddleware())
+// utils
 
-	app.Router.RunTLS(binding, certFile, keyFile)
-	// http.ListenAndServe(binding, app.Router)
+func (o *App) initLogs() {
+	logger := logs.NewSimpleLogger()
+	level := o.Conf.GetString("logs.level")
+	switch level {
+	case "off":
+		logger.SetLevel(logs.Off)
+	case "fatal":
+		logger.SetLevel(logs.Fatal)
+	case "error":
+		logger.SetLevel(logs.Error)
+	case "warning":
+		logger.SetLevel(logs.Warning)
+	case "info":
+		logger.SetLevel(logs.Info)
+	case "debug":
+		logger.SetLevel(logs.Debug)
+	case "trace":
+		logger.SetLevel(logs.Trace)
+	default:
+		panic("this level of the log is not supported")
+	}
+	if o.Conf.GetBool("logs.stdout") {
+		logger.Add(os.Stdout)
+	}
+	logger.SetDir(o.Conf.GetString("logs.path"))
+	loc, err := time.LoadLocation(o.Conf.GetString("logs.location"))
+	if err != nil {
+		panic(err.Error())
+	}
+	logger.SetLocation(loc)
+	logs.SetInstance(logger)
+}
 
+// handlers
+
+func (o *App) meta(c *gin.Context) {
+	if o.metaInfo == nil {
+		for _, mg := range o.modules {
+			o.metaInfo = append(o.metaInfo, ModuleInfo{mg.GetName(), mg.GetPath(), "Module"})
+		}
+	}
+	c.JSON(http.StatusOK, o.metaInfo)
+}
+
+//
+func (o *App) listenForTerminate() {
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGHUP, syscall.SIGKILL, syscall.SIGTERM,
+		syscall.SIGQUIT, syscall.SIGABRT, syscall.SIGSTOP, syscall.SIGPWR)
+	sig := <-signals
+	for _, l := range o.listeners {
+		l.OnTerminate(sig)
+	}
+	if sig != nil {
+		logs.Instance().Handle(logs.Off.New(sig.String()))
+	}
 }

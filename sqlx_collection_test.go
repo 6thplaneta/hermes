@@ -1,9 +1,10 @@
 package hermes
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCheckPostgresColumn(t *testing.T) {

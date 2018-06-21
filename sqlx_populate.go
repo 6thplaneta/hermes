@@ -2,6 +2,7 @@ package hermes
 
 import (
 	"fmt"
+
 	"github.com/jmoiron/sqlx"
 
 	"errors"

@@ -2,14 +2,15 @@ package hermes
 
 import (
 	// "errors"
-	"github.com/gin-gonic/gin"
-	"github.com/satori/go.uuid"
 	"io"
 	"os"
 	"path"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/satori/go.uuid"
 )
 
 /**
@@ -24,7 +25,8 @@ import (
  */
 func Upload(c *gin.Context, inputName, savePath string) (string, error) {
 	//generate unique filename
-	uniquefid := uuid.NewV4().String()
+	uui, _ := uuid.NewV4()
+	uniquefid := uui.String()
 	r := c.Request
 	r.ParseMultipartForm(32 << 20)
 	//get file content

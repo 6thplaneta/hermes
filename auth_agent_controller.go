@@ -1,10 +1,10 @@
 package hermes
 
 import (
-	"encoding/json"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type AgentController struct {
@@ -35,16 +35,16 @@ func (agentCont *AgentController) ChangePassword(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	_, err := AgentColl.UpdatePasswordByOld(token, id, p.Old_Password, p.New_Password)
 	//if system logs data of this http request, hide passwords in log files
-	if application.Logger.Level >= 6 {
-		secretP := p
-		secretP.New_Password = "******"
-		secretP.Old_Password = "******"
-		s, _ := json.Marshal(secretP)
-		application.Logger.LogHttpByBody(c, string(s))
-	}
+	//if application.Logger.Level >= 6 {
+	//	secretP := p
+	//	secretP.New_Password = "******"
+	//	secretP.Old_Password = "******"
+	//	s, _ := json.Marshal(secretP)
+	//	application.Logger.LogHttpByBody(c, string(s))
+	//}
 
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		HandleHttpError(c, err)
 		return
 	}
 
@@ -57,7 +57,7 @@ func (agentCont *AgentController) RequestPasswordToken(c *gin.Context) {
 	//
 	_, err := AgentColl.RequestPasswordToken(c.Param("identity"))
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		HandleHttpError(c, err)
 		return
 	}
 
@@ -72,16 +72,16 @@ func (agentCont *AgentController) ChangePasswordByToken(c *gin.Context) {
 	err := AgentColl.UpdatePasswordByToken(c.Param("token"), p.New_Password, c.Query("email"))
 	//if system logs data of this http request, hide passwords in log files
 
-	if application.Logger.Level >= 6 {
-		secretP := p
-		secretP.New_Password = "******"
-		secretP.Old_Password = "******"
-		s, _ := json.Marshal(secretP)
-		application.Logger.LogHttpByBody(c, string(s))
-	}
+	//if application.Logger.Level >= 6 {
+	//	secretP := p
+	//	secretP.New_Password = "******"
+	//	secretP.Old_Password = "******"
+	//	s, _ := json.Marshal(secretP)
+	//	application.Logger.LogHttpByBody(c, string(s))
+	//}
 
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		HandleHttpError(c, err)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (agentCont *AgentController) ActiveUserByToken(c *gin.Context) {
 	//pass the activation token , if it is valid activate the user
 	err := AgentColl.ActiveUserByToken(c.Param("token"))
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		HandleHttpError(c, err)
 		return
 	}
 
@@ -108,7 +108,7 @@ func (agentCont *AgentController) FBLogin(c *gin.Context) {
 	agent.Device.Ip = c.ClientIP()
 	agentToken, err := AgentColl.FBLogin(agent, ftoken)
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		HandleHttpError(c, err)
 		return
 	}
 
@@ -121,7 +121,7 @@ func (agentCont *AgentController) Login(c *gin.Context) {
 	agent.Device.Ip = c.ClientIP()
 	agentToken, err := AgentColl.Login(agent, "")
 	if err != nil {
-		HandleHttpError(c, err, application.Logger)
+		HandleHttpError(c, err)
 		return
 	}
 
@@ -131,7 +131,7 @@ func (agentCont *AgentController) Login(c *gin.Context) {
 func (agentCont *AgentController) Logout(c *gin.Context) {
 
 	if err := AgentTokenColl.Logout(c.Param("token")); err != nil {
-		HandleHttpError(c, err, application.Logger)
+		HandleHttpError(c, err)
 		return
 	}
 

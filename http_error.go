@@ -1,35 +1,45 @@
 package hermes
 
 import (
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/6thplaneta/go-server/logs"
+
+	"github.com/gin-gonic/gin"
 )
 
-//This function gets error key and returns appropriate message regarding to this key
-func HandleHttpError(c *gin.Context, err error, logger *Logger) {
-	var txt string
-	// txt := "HTTP Request, Method: " + c.Request.Method + " IP: " + c.ClientIP() + " Path:" + c.Request.RequestURI
+// HandleHttpError gets error key and returns appropriate message regarding to this key
+func HandleHttpError(c *gin.Context, err error) {
+	// var txt string
+	txt := "HTTP Request, Method: " + c.Request.Method + " IP: " + c.ClientIP() + " Path:" + c.Request.RequestURI
 	serverName, serverIp, err1 := HostInfo()
 	if err1 == nil {
 		txt = serverName + " " + serverIp + " "
 	}
 	txt += c.Request.RequestURI + " " + c.Request.Method + " " + c.ClientIP()
 
-	if logger.Level >= 5 {
-		token := c.Request.Header.Get("Authorization")
-		if token == "" {
-			txt = txt + "empty "
+	l := &logs.Log{Tag: logs.NewTag("Hermes")}
+	l.Description = fmt.Sprintf("%s [%s  %s  %d  %s]", err.Error(), c.Request.Method, c.Request.URL.Path,
+		500, c.ClientIP())
 
-		} else {
-			txt = txt + token + " "
-		}
+	logs.Instance().HandleSkip(1, l)
 
-	}
+	//if logger.Level >= 5 {
+	//	token := c.Request.Header.Get("Authorization")
+	//	if token == "" {
+	//		txt = txt + "empty "
+	//
+	//	} else {
+	//		txt = txt + token + " "
+	//	}
+	//
+	//}
 
-	if logger != nil {
-		logger.Error(txt + err.Error())
-	}
+	// if logger != nil {
+	// 	logger.Error(txt + err.Error())
+	// }
 	// all errors are internal unless equal specified errors or have Error structure and NotValid/BadRequest Key
 	statusCode := http.StatusInternalServerError
 	if err == ErrNotFound {
@@ -51,7 +61,5 @@ func HandleHttpError(c *gin.Context, err error, logger *Logger) {
 	}
 
 	c.JSON(statusCode, err.Error())
-	c.Abort()
-	return
-
+	// c.Abort()
 }

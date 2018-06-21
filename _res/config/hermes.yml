@@ -1,0 +1,33 @@
+logs:
+  path: "/home/hossein/logs"
+  stdout: true
+  level: "trace"
+  location: "Asia/Tehran"
+db:
+  engine: postgres
+  host: localhost
+  port: 5432
+  name: "app"
+  user: postgres
+  password: s7f4t9
+is_master: true
+router:
+  bind-address: "localhost:8181"
+agents:
+  secret: "cando__project__"
+cache:
+  use_cache: true
+  engine: "freecache"
+  free_cache:
+    size: 1024
+  redis:
+    addr: "tamandar.com:6379"
+    passwd: ""
+search:
+  engine: "sql"  #sql or elastic
+  elastic:
+    addr: "http://127.0.0.1:9200"
+    index: "cando"
+admin:
+  email:  "support@candoapp.net"
+  password: "pouyamahsa"

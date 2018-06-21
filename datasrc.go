@@ -3,6 +3,7 @@ package hermes
 import (
 	"errors"
 	"fmt"
+
 	"github.com/coocood/freecache"
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"
@@ -33,6 +34,15 @@ func (s *SearchClient) LoopIndex() {
 		}
 
 	}
+}
+
+func newDataSrc(conf *viper.Viper) *DataSrc {
+	datasrc := &DataSrc{}
+	err := datasrc.Init(conf)
+	if err != nil {
+		panic(err)
+	}
+	return datasrc
 }
 
 type DataSrc struct {
@@ -138,7 +148,7 @@ func (src *DataSrc) InitCache(conf *viper.Viper) error {
 
 func (src *DataSrc) InitSearch(conf *viper.Viper) error {
 	searchEngine := conf.GetString("search.engine")
-	fmt.Println("search engine, (is elastic)?: ", searchEngine, searchEngine == "elastic")
+	// fmt.Println("search engine, (is elastic)?: ", searchEngine, searchEngine == "elastic")
 	src.Search = &SearchClient{Engine: searchEngine}
 	if searchEngine == "elastic" {
 		addr := conf.GetString("search.elastic.addr")
