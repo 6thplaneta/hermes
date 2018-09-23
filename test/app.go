@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	app := hermes.NewApp()
+	app := hermes.NewApp("./res/hermes.yml")
 	app.Mount(hermes.AuthorizationModule, "/auth")
 	println(app.IsMaster())
 	app.Run()

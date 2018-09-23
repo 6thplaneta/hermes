@@ -1,0 +1,34 @@
+logs:
+  path: "/home/workspace/project/logs"
+  stdout: true
+  level: "trace"
+  location: "Asia/Tehran"
+db:
+  engine: postgres
+  host: localhost
+  port: 5432
+  name: "app"
+  user: postgres
+  password: 123456
+is_master: true
+router:
+  bind-address: "localhost:8181"
+agents:
+  secret: "__project__"
+cache:
+  use_cache: true
+  engine: "freecache"
+  free_cache:
+    size: 1024
+  redis:
+    addr: "example.com:6379"
+    passwd: "123456"
+search:
+  engine: "sql"  #sql or elastic
+  elastic:
+    addr: "http://127.0.0.1:9200"
+    index: "example"
+admin:
+  email:  "support@example.com"
+  password: "123456"
+ 

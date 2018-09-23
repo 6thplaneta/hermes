@@ -15,9 +15,9 @@ import (
 )
 
 // NewApp ...
-func NewApp() *App {
+func NewApp(path string) *App {
 	app := &App{}
-	app.Conf = newViper()
+	app.Conf = newViper(path)
 	app.Router = newGinEngine()
 	app.DataSrc = newDataSrc(app.Conf)
 	app.Router.GET("/meta", app.meta)
